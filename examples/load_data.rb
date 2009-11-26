@@ -7,20 +7,20 @@ require File.join(File.dirname(__FILE__), *%w[.. lib rbhive])
 #    FIELDS TERMINATED BY ',' 
 #    LINES TERMINATED BY '\n'
 # STORED AS TEXTFILE
-
+# at br au 
 countries = %w(at br au de es fr it nl no pl ru se uk us)
 
 RBHive.connect('hadoopmaster.cluster.trafficbroker.co.uk') do |db|
   
   countries.each do |country|
 
-    (1..31).each do |day|
+    (6..8).each do |day|
       padded_day = day.to_s.rjust(2, '0')
       
-      file_date = "200910#{padded_day}"
+      file_date = "200911#{padded_day}"
       input_file = "/user/deploy/input/keyword-reports/#{country}-#{file_date}.csv"
       
-      import_date = "2009-10-#{padded_day}"
+      import_date = "2009-11-#{padded_day}"
       command = "LOAD DATA INPATH '#{input_file}' INTO TABLE keyword_reports PARTITION (import_date='#{import_date}', country='#{country}')"
       
       puts "Running #{command}"
