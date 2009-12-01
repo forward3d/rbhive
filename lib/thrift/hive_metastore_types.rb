@@ -49,14 +49,14 @@ class Type
   NAME = 1
   TYPE1 = 2
   TYPE2 = 3
-  FIELDS = 4
+  F = 4
 
   ::Thrift::Struct.field_accessor self, :name, :type1, :type2, :fields
   FIELDS = {
     NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
     TYPE1 => {:type => ::Thrift::Types::STRING, :name => 'type1', :optional => true},
     TYPE2 => {:type => ::Thrift::Types::STRING, :name => 'type2', :optional => true},
-    FIELDS => {:type => ::Thrift::Types::LIST, :name => 'fields', :element => {:type => ::Thrift::Types::STRUCT, :class => FieldSchema}, :optional => true}
+    F => {:type => ::Thrift::Types::LIST, :name => 'fields', :element => {:type => ::Thrift::Types::STRUCT, :class => FieldSchema}, :optional => true}
   }
 
   def struct_fields; FIELDS; end
