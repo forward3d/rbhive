@@ -1,1 +1,1 @@
-require File.join(File.dirname(__FILE__), 'connection')
+require File.join(File.dirname(__FILE__), 'rbhive', 'connection')

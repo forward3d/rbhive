@@ -1,5 +1,4 @@
-require "rubygems"
-require File.join(File.dirname(__FILE__), *%w[thrift thrift_hive])
+require File.join(File.dirname(__FILE__), *%w[.. thrift thrift_hive])
 
 module RBHive
   def connect(server, port=10_000)
