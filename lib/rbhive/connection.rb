@@ -3,11 +3,13 @@ require File.join(File.dirname(__FILE__), *%w[.. thrift thrift_hive])
 module RBHive
   def connect(server, port=10_000)
     connection = RBHive::Connection.new(server, port)
+    ret = nil
     begin
       connection.open
-      yield(connection)
+      ret = yield(connection)
     ensure
       connection.close
+      ret
     end
   end
   module_function :connect
