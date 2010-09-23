@@ -12,21 +12,21 @@ module ThriftHiveMetastore
   class Client < FacebookService::Client 
     include ::Thrift::Client
 
-    def create_database(name, description)
-      send_create_database(name, description)
-      return recv_create_database()
+    def create_database(database)
+      send_create_database(database)
+      recv_create_database()
     end
 
-    def send_create_database(name, description)
-      send_message('create_database', Create_database_args, :name => name, :description => description)
+    def send_create_database(database)
+      send_message('create_database', Create_database_args, :database => database)
     end
 
     def recv_create_database()
       result = receive_message(Create_database_result)
-      return result.success unless result.success.nil?
       raise result.o1 unless result.o1.nil?
       raise result.o2 unless result.o2.nil?
-      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'create_database failed: unknown result')
+      raise result.o3 unless result.o3.nil?
+      return
     end
 
     def get_database(name)
@@ -46,29 +46,30 @@ module ThriftHiveMetastore
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_database failed: unknown result')
     end
 
-    def drop_database(name)
-      send_drop_database(name)
-      return recv_drop_database()
+    def drop_database(name, deleteData)
+      send_drop_database(name, deleteData)
+      recv_drop_database()
     end
 
-    def send_drop_database(name)
-      send_message('drop_database', Drop_database_args, :name => name)
+    def send_drop_database(name, deleteData)
+      send_message('drop_database', Drop_database_args, :name => name, :deleteData => deleteData)
     end
 
     def recv_drop_database()
       result = receive_message(Drop_database_result)
-      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
       raise result.o2 unless result.o2.nil?
-      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'drop_database failed: unknown result')
+      raise result.o3 unless result.o3.nil?
+      return
     end
 
-    def get_databases()
-      send_get_databases()
+    def get_databases(pattern)
+      send_get_databases(pattern)
       return recv_get_databases()
     end
 
-    def send_get_databases()
-      send_message('get_databases', Get_databases_args)
+    def send_get_databases(pattern)
+      send_message('get_databases', Get_databases_args, :pattern => pattern)
     end
 
     def recv_get_databases()
@@ -76,6 +77,22 @@ module ThriftHiveMetastore
       return result.success unless result.success.nil?
       raise result.o1 unless result.o1.nil?
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_databases failed: unknown result')
+    end
+
+    def get_all_databases()
+      send_get_all_databases()
+      return recv_get_all_databases()
+    end
+
+    def send_get_all_databases()
+      send_message('get_all_databases', Get_all_databases_args)
+    end
+
+    def recv_get_all_databases()
+      result = receive_message(Get_all_databases_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_all_databases failed: unknown result')
     end
 
     def get_type(name)
@@ -90,6 +107,7 @@ module ThriftHiveMetastore
     def recv_get_type()
       result = receive_message(Get_type_result)
       return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
       raise result.o2 unless result.o2.nil?
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_type failed: unknown result')
     end
@@ -124,6 +142,7 @@ module ThriftHiveMetastore
     def recv_drop_type()
       result = receive_message(Drop_type_result)
       return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
       raise result.o2 unless result.o2.nil?
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'drop_type failed: unknown result')
     end
@@ -230,6 +249,22 @@ module ThriftHiveMetastore
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_tables failed: unknown result')
     end
 
+    def get_all_tables(db_name)
+      send_get_all_tables(db_name)
+      return recv_get_all_tables()
+    end
+
+    def send_get_all_tables(db_name)
+      send_message('get_all_tables', Get_all_tables_args, :db_name => db_name)
+    end
+
+    def recv_get_all_tables()
+      result = receive_message(Get_all_tables_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_all_tables failed: unknown result')
+    end
+
     def get_table(dbname, tbl_name)
       send_get_table(dbname, tbl_name)
       return recv_get_table()
@@ -299,6 +334,24 @@ module ThriftHiveMetastore
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'append_partition failed: unknown result')
     end
 
+    def append_partition_by_name(db_name, tbl_name, part_name)
+      send_append_partition_by_name(db_name, tbl_name, part_name)
+      return recv_append_partition_by_name()
+    end
+
+    def send_append_partition_by_name(db_name, tbl_name, part_name)
+      send_message('append_partition_by_name', Append_partition_by_name_args, :db_name => db_name, :tbl_name => tbl_name, :part_name => part_name)
+    end
+
+    def recv_append_partition_by_name()
+      result = receive_message(Append_partition_by_name_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
+      raise result.o3 unless result.o3.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'append_partition_by_name failed: unknown result')
+    end
+
     def drop_partition(db_name, tbl_name, part_vals, deleteData)
       send_drop_partition(db_name, tbl_name, part_vals, deleteData)
       return recv_drop_partition()
@@ -316,6 +369,23 @@ module ThriftHiveMetastore
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'drop_partition failed: unknown result')
     end
 
+    def drop_partition_by_name(db_name, tbl_name, part_name, deleteData)
+      send_drop_partition_by_name(db_name, tbl_name, part_name, deleteData)
+      return recv_drop_partition_by_name()
+    end
+
+    def send_drop_partition_by_name(db_name, tbl_name, part_name, deleteData)
+      send_message('drop_partition_by_name', Drop_partition_by_name_args, :db_name => db_name, :tbl_name => tbl_name, :part_name => part_name, :deleteData => deleteData)
+    end
+
+    def recv_drop_partition_by_name()
+      result = receive_message(Drop_partition_by_name_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'drop_partition_by_name failed: unknown result')
+    end
+
     def get_partition(db_name, tbl_name, part_vals)
       send_get_partition(db_name, tbl_name, part_vals)
       return recv_get_partition()
@@ -329,7 +399,25 @@ module ThriftHiveMetastore
       result = receive_message(Get_partition_result)
       return result.success unless result.success.nil?
       raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_partition failed: unknown result')
+    end
+
+    def get_partition_by_name(db_name, tbl_name, part_name)
+      send_get_partition_by_name(db_name, tbl_name, part_name)
+      return recv_get_partition_by_name()
+    end
+
+    def send_get_partition_by_name(db_name, tbl_name, part_name)
+      send_message('get_partition_by_name', Get_partition_by_name_args, :db_name => db_name, :tbl_name => tbl_name, :part_name => part_name)
+    end
+
+    def recv_get_partition_by_name()
+      result = receive_message(Get_partition_by_name_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_partition_by_name failed: unknown result')
     end
 
     def get_partitions(db_name, tbl_name, max_parts)
@@ -365,6 +453,55 @@ module ThriftHiveMetastore
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_partition_names failed: unknown result')
     end
 
+    def get_partitions_ps(db_name, tbl_name, part_vals, max_parts)
+      send_get_partitions_ps(db_name, tbl_name, part_vals, max_parts)
+      return recv_get_partitions_ps()
+    end
+
+    def send_get_partitions_ps(db_name, tbl_name, part_vals, max_parts)
+      send_message('get_partitions_ps', Get_partitions_ps_args, :db_name => db_name, :tbl_name => tbl_name, :part_vals => part_vals, :max_parts => max_parts)
+    end
+
+    def recv_get_partitions_ps()
+      result = receive_message(Get_partitions_ps_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_partitions_ps failed: unknown result')
+    end
+
+    def get_partition_names_ps(db_name, tbl_name, part_vals, max_parts)
+      send_get_partition_names_ps(db_name, tbl_name, part_vals, max_parts)
+      return recv_get_partition_names_ps()
+    end
+
+    def send_get_partition_names_ps(db_name, tbl_name, part_vals, max_parts)
+      send_message('get_partition_names_ps', Get_partition_names_ps_args, :db_name => db_name, :tbl_name => tbl_name, :part_vals => part_vals, :max_parts => max_parts)
+    end
+
+    def recv_get_partition_names_ps()
+      result = receive_message(Get_partition_names_ps_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_partition_names_ps failed: unknown result')
+    end
+
+    def get_partitions_by_filter(db_name, tbl_name, filter, max_parts)
+      send_get_partitions_by_filter(db_name, tbl_name, filter, max_parts)
+      return recv_get_partitions_by_filter()
+    end
+
+    def send_get_partitions_by_filter(db_name, tbl_name, filter, max_parts)
+      send_message('get_partitions_by_filter', Get_partitions_by_filter_args, :db_name => db_name, :tbl_name => tbl_name, :filter => filter, :max_parts => max_parts)
+    end
+
+    def recv_get_partitions_by_filter()
+      result = receive_message(Get_partitions_by_filter_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_partitions_by_filter failed: unknown result')
+    end
+
     def alter_partition(db_name, tbl_name, new_part)
       send_alter_partition(db_name, tbl_name, new_part)
       recv_alter_partition()
@@ -381,6 +518,139 @@ module ThriftHiveMetastore
       return
     end
 
+    def get_config_value(name, defaultValue)
+      send_get_config_value(name, defaultValue)
+      return recv_get_config_value()
+    end
+
+    def send_get_config_value(name, defaultValue)
+      send_message('get_config_value', Get_config_value_args, :name => name, :defaultValue => defaultValue)
+    end
+
+    def recv_get_config_value()
+      result = receive_message(Get_config_value_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_config_value failed: unknown result')
+    end
+
+    def partition_name_to_vals(part_name)
+      send_partition_name_to_vals(part_name)
+      return recv_partition_name_to_vals()
+    end
+
+    def send_partition_name_to_vals(part_name)
+      send_message('partition_name_to_vals', Partition_name_to_vals_args, :part_name => part_name)
+    end
+
+    def recv_partition_name_to_vals()
+      result = receive_message(Partition_name_to_vals_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'partition_name_to_vals failed: unknown result')
+    end
+
+    def partition_name_to_spec(part_name)
+      send_partition_name_to_spec(part_name)
+      return recv_partition_name_to_spec()
+    end
+
+    def send_partition_name_to_spec(part_name)
+      send_message('partition_name_to_spec', Partition_name_to_spec_args, :part_name => part_name)
+    end
+
+    def recv_partition_name_to_spec()
+      result = receive_message(Partition_name_to_spec_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'partition_name_to_spec failed: unknown result')
+    end
+
+    def add_index(new_index, index_table)
+      send_add_index(new_index, index_table)
+      return recv_add_index()
+    end
+
+    def send_add_index(new_index, index_table)
+      send_message('add_index', Add_index_args, :new_index => new_index, :index_table => index_table)
+    end
+
+    def recv_add_index()
+      result = receive_message(Add_index_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
+      raise result.o3 unless result.o3.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'add_index failed: unknown result')
+    end
+
+    def drop_index_by_name(db_name, tbl_name, index_name, deleteData)
+      send_drop_index_by_name(db_name, tbl_name, index_name, deleteData)
+      return recv_drop_index_by_name()
+    end
+
+    def send_drop_index_by_name(db_name, tbl_name, index_name, deleteData)
+      send_message('drop_index_by_name', Drop_index_by_name_args, :db_name => db_name, :tbl_name => tbl_name, :index_name => index_name, :deleteData => deleteData)
+    end
+
+    def recv_drop_index_by_name()
+      result = receive_message(Drop_index_by_name_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'drop_index_by_name failed: unknown result')
+    end
+
+    def get_index_by_name(db_name, tbl_name, index_name)
+      send_get_index_by_name(db_name, tbl_name, index_name)
+      return recv_get_index_by_name()
+    end
+
+    def send_get_index_by_name(db_name, tbl_name, index_name)
+      send_message('get_index_by_name', Get_index_by_name_args, :db_name => db_name, :tbl_name => tbl_name, :index_name => index_name)
+    end
+
+    def recv_get_index_by_name()
+      result = receive_message(Get_index_by_name_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_index_by_name failed: unknown result')
+    end
+
+    def get_indexes(db_name, tbl_name, max_indexes)
+      send_get_indexes(db_name, tbl_name, max_indexes)
+      return recv_get_indexes()
+    end
+
+    def send_get_indexes(db_name, tbl_name, max_indexes)
+      send_message('get_indexes', Get_indexes_args, :db_name => db_name, :tbl_name => tbl_name, :max_indexes => max_indexes)
+    end
+
+    def recv_get_indexes()
+      result = receive_message(Get_indexes_result)
+      return result.success unless result.success.nil?
+      raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_indexes failed: unknown result')
+    end
+
+    def get_index_names(db_name, tbl_name, max_indexes)
+      send_get_index_names(db_name, tbl_name, max_indexes)
+      return recv_get_index_names()
+    end
+
+    def send_get_index_names(db_name, tbl_name, max_indexes)
+      send_message('get_index_names', Get_index_names_args, :db_name => db_name, :tbl_name => tbl_name, :max_indexes => max_indexes)
+    end
+
+    def recv_get_index_names()
+      result = receive_message(Get_index_names_result)
+      return result.success unless result.success.nil?
+      raise result.o2 unless result.o2.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_index_names failed: unknown result')
+    end
+
   end
 
   class Processor < FacebookService::Processor 
@@ -390,11 +660,13 @@ module ThriftHiveMetastore
       args = read_args(iprot, Create_database_args)
       result = Create_database_result.new()
       begin
-        result.success = @handler.create_database(args.name, args.description)
+        @handler.create_database(args.database)
       rescue AlreadyExistsException => o1
         result.o1 = o1
-      rescue MetaException => o2
+      rescue InvalidObjectException => o2
         result.o2 = o2
+      rescue MetaException => o3
+        result.o3 = o3
       end
       write_result(result, oprot, 'create_database', seqid)
     end
@@ -416,9 +688,13 @@ module ThriftHiveMetastore
       args = read_args(iprot, Drop_database_args)
       result = Drop_database_result.new()
       begin
-        result.success = @handler.drop_database(args.name)
-      rescue MetaException => o2
+        @handler.drop_database(args.name, args.deleteData)
+      rescue NoSuchObjectException => o1
+        result.o1 = o1
+      rescue InvalidOperationException => o2
         result.o2 = o2
+      rescue MetaException => o3
+        result.o3 = o3
       end
       write_result(result, oprot, 'drop_database', seqid)
     end
@@ -427,11 +703,22 @@ module ThriftHiveMetastore
       args = read_args(iprot, Get_databases_args)
       result = Get_databases_result.new()
       begin
-        result.success = @handler.get_databases()
+        result.success = @handler.get_databases(args.pattern)
       rescue MetaException => o1
         result.o1 = o1
       end
       write_result(result, oprot, 'get_databases', seqid)
+    end
+
+    def process_get_all_databases(seqid, iprot, oprot)
+      args = read_args(iprot, Get_all_databases_args)
+      result = Get_all_databases_result.new()
+      begin
+        result.success = @handler.get_all_databases()
+      rescue MetaException => o1
+        result.o1 = o1
+      end
+      write_result(result, oprot, 'get_all_databases', seqid)
     end
 
     def process_get_type(seqid, iprot, oprot)
@@ -439,7 +726,9 @@ module ThriftHiveMetastore
       result = Get_type_result.new()
       begin
         result.success = @handler.get_type(args.name)
-      rescue MetaException => o2
+      rescue MetaException => o1
+        result.o1 = o1
+      rescue NoSuchObjectException => o2
         result.o2 = o2
       end
       write_result(result, oprot, 'get_type', seqid)
@@ -465,7 +754,9 @@ module ThriftHiveMetastore
       result = Drop_type_result.new()
       begin
         result.success = @handler.drop_type(args.type)
-      rescue MetaException => o2
+      rescue MetaException => o1
+        result.o1 = o1
+      rescue NoSuchObjectException => o2
         result.o2 = o2
       end
       write_result(result, oprot, 'drop_type', seqid)
@@ -553,6 +844,17 @@ module ThriftHiveMetastore
       write_result(result, oprot, 'get_tables', seqid)
     end
 
+    def process_get_all_tables(seqid, iprot, oprot)
+      args = read_args(iprot, Get_all_tables_args)
+      result = Get_all_tables_result.new()
+      begin
+        result.success = @handler.get_all_tables(args.db_name)
+      rescue MetaException => o1
+        result.o1 = o1
+      end
+      write_result(result, oprot, 'get_all_tables', seqid)
+    end
+
     def process_get_table(seqid, iprot, oprot)
       args = read_args(iprot, Get_table_args)
       result = Get_table_result.new()
@@ -609,6 +911,21 @@ module ThriftHiveMetastore
       write_result(result, oprot, 'append_partition', seqid)
     end
 
+    def process_append_partition_by_name(seqid, iprot, oprot)
+      args = read_args(iprot, Append_partition_by_name_args)
+      result = Append_partition_by_name_result.new()
+      begin
+        result.success = @handler.append_partition_by_name(args.db_name, args.tbl_name, args.part_name)
+      rescue InvalidObjectException => o1
+        result.o1 = o1
+      rescue AlreadyExistsException => o2
+        result.o2 = o2
+      rescue MetaException => o3
+        result.o3 = o3
+      end
+      write_result(result, oprot, 'append_partition_by_name', seqid)
+    end
+
     def process_drop_partition(seqid, iprot, oprot)
       args = read_args(iprot, Drop_partition_args)
       result = Drop_partition_result.new()
@@ -622,6 +939,19 @@ module ThriftHiveMetastore
       write_result(result, oprot, 'drop_partition', seqid)
     end
 
+    def process_drop_partition_by_name(seqid, iprot, oprot)
+      args = read_args(iprot, Drop_partition_by_name_args)
+      result = Drop_partition_by_name_result.new()
+      begin
+        result.success = @handler.drop_partition_by_name(args.db_name, args.tbl_name, args.part_name, args.deleteData)
+      rescue NoSuchObjectException => o1
+        result.o1 = o1
+      rescue MetaException => o2
+        result.o2 = o2
+      end
+      write_result(result, oprot, 'drop_partition_by_name', seqid)
+    end
+
     def process_get_partition(seqid, iprot, oprot)
       args = read_args(iprot, Get_partition_args)
       result = Get_partition_result.new()
@@ -629,8 +959,23 @@ module ThriftHiveMetastore
         result.success = @handler.get_partition(args.db_name, args.tbl_name, args.part_vals)
       rescue MetaException => o1
         result.o1 = o1
+      rescue NoSuchObjectException => o2
+        result.o2 = o2
       end
       write_result(result, oprot, 'get_partition', seqid)
+    end
+
+    def process_get_partition_by_name(seqid, iprot, oprot)
+      args = read_args(iprot, Get_partition_by_name_args)
+      result = Get_partition_by_name_result.new()
+      begin
+        result.success = @handler.get_partition_by_name(args.db_name, args.tbl_name, args.part_name)
+      rescue MetaException => o1
+        result.o1 = o1
+      rescue NoSuchObjectException => o2
+        result.o2 = o2
+      end
+      write_result(result, oprot, 'get_partition_by_name', seqid)
     end
 
     def process_get_partitions(seqid, iprot, oprot)
@@ -657,6 +1002,41 @@ module ThriftHiveMetastore
       write_result(result, oprot, 'get_partition_names', seqid)
     end
 
+    def process_get_partitions_ps(seqid, iprot, oprot)
+      args = read_args(iprot, Get_partitions_ps_args)
+      result = Get_partitions_ps_result.new()
+      begin
+        result.success = @handler.get_partitions_ps(args.db_name, args.tbl_name, args.part_vals, args.max_parts)
+      rescue MetaException => o1
+        result.o1 = o1
+      end
+      write_result(result, oprot, 'get_partitions_ps', seqid)
+    end
+
+    def process_get_partition_names_ps(seqid, iprot, oprot)
+      args = read_args(iprot, Get_partition_names_ps_args)
+      result = Get_partition_names_ps_result.new()
+      begin
+        result.success = @handler.get_partition_names_ps(args.db_name, args.tbl_name, args.part_vals, args.max_parts)
+      rescue MetaException => o1
+        result.o1 = o1
+      end
+      write_result(result, oprot, 'get_partition_names_ps', seqid)
+    end
+
+    def process_get_partitions_by_filter(seqid, iprot, oprot)
+      args = read_args(iprot, Get_partitions_by_filter_args)
+      result = Get_partitions_by_filter_result.new()
+      begin
+        result.success = @handler.get_partitions_by_filter(args.db_name, args.tbl_name, args.filter, args.max_parts)
+      rescue MetaException => o1
+        result.o1 = o1
+      rescue NoSuchObjectException => o2
+        result.o2 = o2
+      end
+      write_result(result, oprot, 'get_partitions_by_filter', seqid)
+    end
+
     def process_alter_partition(seqid, iprot, oprot)
       args = read_args(iprot, Alter_partition_args)
       result = Alter_partition_result.new()
@@ -670,19 +1050,114 @@ module ThriftHiveMetastore
       write_result(result, oprot, 'alter_partition', seqid)
     end
 
+    def process_get_config_value(seqid, iprot, oprot)
+      args = read_args(iprot, Get_config_value_args)
+      result = Get_config_value_result.new()
+      begin
+        result.success = @handler.get_config_value(args.name, args.defaultValue)
+      rescue ConfigValSecurityException => o1
+        result.o1 = o1
+      end
+      write_result(result, oprot, 'get_config_value', seqid)
+    end
+
+    def process_partition_name_to_vals(seqid, iprot, oprot)
+      args = read_args(iprot, Partition_name_to_vals_args)
+      result = Partition_name_to_vals_result.new()
+      begin
+        result.success = @handler.partition_name_to_vals(args.part_name)
+      rescue MetaException => o1
+        result.o1 = o1
+      end
+      write_result(result, oprot, 'partition_name_to_vals', seqid)
+    end
+
+    def process_partition_name_to_spec(seqid, iprot, oprot)
+      args = read_args(iprot, Partition_name_to_spec_args)
+      result = Partition_name_to_spec_result.new()
+      begin
+        result.success = @handler.partition_name_to_spec(args.part_name)
+      rescue MetaException => o1
+        result.o1 = o1
+      end
+      write_result(result, oprot, 'partition_name_to_spec', seqid)
+    end
+
+    def process_add_index(seqid, iprot, oprot)
+      args = read_args(iprot, Add_index_args)
+      result = Add_index_result.new()
+      begin
+        result.success = @handler.add_index(args.new_index, args.index_table)
+      rescue InvalidObjectException => o1
+        result.o1 = o1
+      rescue AlreadyExistsException => o2
+        result.o2 = o2
+      rescue MetaException => o3
+        result.o3 = o3
+      end
+      write_result(result, oprot, 'add_index', seqid)
+    end
+
+    def process_drop_index_by_name(seqid, iprot, oprot)
+      args = read_args(iprot, Drop_index_by_name_args)
+      result = Drop_index_by_name_result.new()
+      begin
+        result.success = @handler.drop_index_by_name(args.db_name, args.tbl_name, args.index_name, args.deleteData)
+      rescue NoSuchObjectException => o1
+        result.o1 = o1
+      rescue MetaException => o2
+        result.o2 = o2
+      end
+      write_result(result, oprot, 'drop_index_by_name', seqid)
+    end
+
+    def process_get_index_by_name(seqid, iprot, oprot)
+      args = read_args(iprot, Get_index_by_name_args)
+      result = Get_index_by_name_result.new()
+      begin
+        result.success = @handler.get_index_by_name(args.db_name, args.tbl_name, args.index_name)
+      rescue MetaException => o1
+        result.o1 = o1
+      rescue NoSuchObjectException => o2
+        result.o2 = o2
+      end
+      write_result(result, oprot, 'get_index_by_name', seqid)
+    end
+
+    def process_get_indexes(seqid, iprot, oprot)
+      args = read_args(iprot, Get_indexes_args)
+      result = Get_indexes_result.new()
+      begin
+        result.success = @handler.get_indexes(args.db_name, args.tbl_name, args.max_indexes)
+      rescue NoSuchObjectException => o1
+        result.o1 = o1
+      rescue MetaException => o2
+        result.o2 = o2
+      end
+      write_result(result, oprot, 'get_indexes', seqid)
+    end
+
+    def process_get_index_names(seqid, iprot, oprot)
+      args = read_args(iprot, Get_index_names_args)
+      result = Get_index_names_result.new()
+      begin
+        result.success = @handler.get_index_names(args.db_name, args.tbl_name, args.max_indexes)
+      rescue MetaException => o2
+        result.o2 = o2
+      end
+      write_result(result, oprot, 'get_index_names', seqid)
+    end
+
   end
 
   # HELPER FUNCTIONS AND STRUCTURES
 
   class Create_database_args
-    include ::Thrift::Struct
-    NAME = 1
-    DESCRIPTION = 2
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DATABASE = 1
 
-    ::Thrift::Struct.field_accessor self, :name, :description
     FIELDS = {
-      NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
-      DESCRIPTION => {:type => ::Thrift::Types::STRING, :name => 'description'}
+      DATABASE => {:type => ::Thrift::Types::STRUCT, :name => 'database', :class => Database}
     }
 
     def struct_fields; FIELDS; end
@@ -690,19 +1165,19 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Create_database_result
-    include ::Thrift::Struct
-    SUCCESS = 0
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     O1 = 1
     O2 = 2
+    O3 = 3
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2
     FIELDS = {
-      SUCCESS => {:type => ::Thrift::Types::BOOL, :name => 'success'},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => AlreadyExistsException},
-      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => InvalidObjectException},
+      O3 => {:type => ::Thrift::Types::STRUCT, :name => 'o3', :class => MetaException}
     }
 
     def struct_fields; FIELDS; end
@@ -710,13 +1185,13 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_database_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     NAME = 1
 
-    ::Thrift::Struct.field_accessor self, :name
     FIELDS = {
       NAME => {:type => ::Thrift::Types::STRING, :name => 'name'}
     }
@@ -726,15 +1201,15 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_database_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
     O2 = 2
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Database},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => NoSuchObjectException},
@@ -746,15 +1221,17 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Drop_database_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     NAME = 1
+    DELETEDATA = 2
 
-    ::Thrift::Struct.field_accessor self, :name
     FIELDS = {
-      NAME => {:type => ::Thrift::Types::STRING, :name => 'name'}
+      NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
+      DELETEDATA => {:type => ::Thrift::Types::BOOL, :name => 'deleteData'}
     }
 
     def struct_fields; FIELDS; end
@@ -762,17 +1239,19 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Drop_database_result
-    include ::Thrift::Struct
-    SUCCESS = 0
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    O1 = 1
     O2 = 2
+    O3 = 3
 
-    ::Thrift::Struct.field_accessor self, :success, :o2
     FIELDS = {
-      SUCCESS => {:type => ::Thrift::Types::BOOL, :name => 'success'},
-      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => NoSuchObjectException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => InvalidOperationException},
+      O3 => {:type => ::Thrift::Types::STRUCT, :name => 'o3', :class => MetaException}
     }
 
     def struct_fields; FIELDS; end
@@ -780,13 +1259,15 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_databases_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    PATTERN = 1
 
     FIELDS = {
-
+      PATTERN => {:type => ::Thrift::Types::STRING, :name => 'pattern'}
     }
 
     def struct_fields; FIELDS; end
@@ -794,14 +1275,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_databases_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :o1
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException}
@@ -812,13 +1293,46 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_all_databases_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+
+    FIELDS = {
+
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_all_databases_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_type_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     NAME = 1
 
-    ::Thrift::Struct.field_accessor self, :name
     FIELDS = {
       NAME => {:type => ::Thrift::Types::STRING, :name => 'name'}
     }
@@ -828,17 +1342,19 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_type_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
-    O2 = 1
+    O1 = 1
+    O2 = 2
 
-    ::Thrift::Struct.field_accessor self, :success, :o2
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Type},
-      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => NoSuchObjectException}
     }
 
     def struct_fields; FIELDS; end
@@ -846,13 +1362,13 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Create_type_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     TYPE = 1
 
-    ::Thrift::Struct.field_accessor self, :type
     FIELDS = {
       TYPE => {:type => ::Thrift::Types::STRUCT, :name => 'type', :class => Type}
     }
@@ -862,16 +1378,16 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Create_type_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
     O2 = 2
     O3 = 3
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2, :o3
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::BOOL, :name => 'success'},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => AlreadyExistsException},
@@ -884,13 +1400,13 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Drop_type_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     TYPE = 1
 
-    ::Thrift::Struct.field_accessor self, :type
     FIELDS = {
       TYPE => {:type => ::Thrift::Types::STRING, :name => 'type'}
     }
@@ -900,17 +1416,19 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Drop_type_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
-    O2 = 1
+    O1 = 1
+    O2 = 2
 
-    ::Thrift::Struct.field_accessor self, :success, :o2
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::BOOL, :name => 'success'},
-      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => NoSuchObjectException}
     }
 
     def struct_fields; FIELDS; end
@@ -918,13 +1436,13 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_type_all_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     NAME = 1
 
-    ::Thrift::Struct.field_accessor self, :name
     FIELDS = {
       NAME => {:type => ::Thrift::Types::STRING, :name => 'name'}
     }
@@ -934,14 +1452,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_type_all_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O2 = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :o2
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::MAP, :name => 'success', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRUCT, :class => Type}},
       O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
@@ -952,14 +1470,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_fields_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DB_NAME = 1
     TABLE_NAME = 2
 
-    ::Thrift::Struct.field_accessor self, :db_name, :table_name
     FIELDS = {
       DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
       TABLE_NAME => {:type => ::Thrift::Types::STRING, :name => 'table_name'}
@@ -970,16 +1488,16 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_fields_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
     O2 = 2
     O3 = 3
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2, :o3
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => FieldSchema}},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException},
@@ -992,14 +1510,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_schema_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DB_NAME = 1
     TABLE_NAME = 2
 
-    ::Thrift::Struct.field_accessor self, :db_name, :table_name
     FIELDS = {
       DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
       TABLE_NAME => {:type => ::Thrift::Types::STRING, :name => 'table_name'}
@@ -1010,16 +1528,16 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_schema_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
     O2 = 2
     O3 = 3
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2, :o3
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => FieldSchema}},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException},
@@ -1032,13 +1550,13 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Create_table_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     TBL = 1
 
-    ::Thrift::Struct.field_accessor self, :tbl
     FIELDS = {
       TBL => {:type => ::Thrift::Types::STRUCT, :name => 'tbl', :class => Table}
     }
@@ -1048,16 +1566,16 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Create_table_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     O1 = 1
     O2 = 2
     O3 = 3
     O4 = 4
 
-    ::Thrift::Struct.field_accessor self, :o1, :o2, :o3, :o4
     FIELDS = {
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => AlreadyExistsException},
       O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => InvalidObjectException},
@@ -1070,15 +1588,15 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Drop_table_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DBNAME = 1
     NAME = 2
     DELETEDATA = 3
 
-    ::Thrift::Struct.field_accessor self, :dbname, :name, :deleteData
     FIELDS = {
       DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbname'},
       NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
@@ -1090,14 +1608,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Drop_table_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     O1 = 1
     O3 = 2
 
-    ::Thrift::Struct.field_accessor self, :o1, :o3
     FIELDS = {
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => NoSuchObjectException},
       O3 => {:type => ::Thrift::Types::STRUCT, :name => 'o3', :class => MetaException}
@@ -1108,14 +1626,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_tables_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DB_NAME = 1
     PATTERN = 2
 
-    ::Thrift::Struct.field_accessor self, :db_name, :pattern
     FIELDS = {
       DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
       PATTERN => {:type => ::Thrift::Types::STRING, :name => 'pattern'}
@@ -1126,14 +1644,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_tables_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :o1
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException}
@@ -1144,14 +1662,48 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_all_tables_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_all_tables_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_table_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DBNAME = 1
     TBL_NAME = 2
 
-    ::Thrift::Struct.field_accessor self, :dbname, :tbl_name
     FIELDS = {
       DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbname'},
       TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'}
@@ -1162,15 +1714,15 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_table_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
     O2 = 2
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Table},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException},
@@ -1182,15 +1734,15 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Alter_table_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DBNAME = 1
     TBL_NAME = 2
     NEW_TBL = 3
 
-    ::Thrift::Struct.field_accessor self, :dbname, :tbl_name, :new_tbl
     FIELDS = {
       DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbname'},
       TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
@@ -1202,14 +1754,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Alter_table_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     O1 = 1
     O2 = 2
 
-    ::Thrift::Struct.field_accessor self, :o1, :o2
     FIELDS = {
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => InvalidOperationException},
       O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
@@ -1220,13 +1772,13 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Add_partition_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     NEW_PART = 1
 
-    ::Thrift::Struct.field_accessor self, :new_part
     FIELDS = {
       NEW_PART => {:type => ::Thrift::Types::STRUCT, :name => 'new_part', :class => Partition}
     }
@@ -1236,16 +1788,16 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Add_partition_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
     O2 = 2
     O3 = 3
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2, :o3
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Partition},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => InvalidObjectException},
@@ -1258,15 +1810,15 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Append_partition_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DB_NAME = 1
     TBL_NAME = 2
     PART_VALS = 3
 
-    ::Thrift::Struct.field_accessor self, :db_name, :tbl_name, :part_vals
     FIELDS = {
       DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
       TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
@@ -1278,16 +1830,16 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Append_partition_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
     O2 = 2
     O3 = 3
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2, :o3
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Partition},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => InvalidObjectException},
@@ -1300,16 +1852,58 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Append_partition_by_name_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    PART_NAME = 3
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      PART_NAME => {:type => ::Thrift::Types::STRING, :name => 'part_name'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Append_partition_by_name_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+    O2 = 2
+    O3 = 3
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Partition},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => InvalidObjectException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => AlreadyExistsException},
+      O3 => {:type => ::Thrift::Types::STRUCT, :name => 'o3', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Drop_partition_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DB_NAME = 1
     TBL_NAME = 2
     PART_VALS = 3
     DELETEDATA = 4
 
-    ::Thrift::Struct.field_accessor self, :db_name, :tbl_name, :part_vals, :deleteData
     FIELDS = {
       DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
       TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
@@ -1322,15 +1916,15 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Drop_partition_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
     O2 = 2
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::BOOL, :name => 'success'},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => NoSuchObjectException},
@@ -1342,15 +1936,57 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Drop_partition_by_name_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    PART_NAME = 3
+    DELETEDATA = 4
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      PART_NAME => {:type => ::Thrift::Types::STRING, :name => 'part_name'},
+      DELETEDATA => {:type => ::Thrift::Types::BOOL, :name => 'deleteData'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Drop_partition_by_name_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+    O2 = 2
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::BOOL, :name => 'success'},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => NoSuchObjectException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_partition_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DB_NAME = 1
     TBL_NAME = 2
     PART_VALS = 3
 
-    ::Thrift::Struct.field_accessor self, :db_name, :tbl_name, :part_vals
     FIELDS = {
       DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
       TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
@@ -1362,17 +1998,19 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_partition_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
+    O2 = 2
 
-    ::Thrift::Struct.field_accessor self, :success, :o1
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Partition},
-      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException}
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => NoSuchObjectException}
     }
 
     def struct_fields; FIELDS; end
@@ -1380,15 +2018,55 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_partition_by_name_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    PART_NAME = 3
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      PART_NAME => {:type => ::Thrift::Types::STRING, :name => 'part_name'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_partition_by_name_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+    O2 = 2
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Partition},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => NoSuchObjectException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_partitions_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DB_NAME = 1
     TBL_NAME = 2
     MAX_PARTS = 3
 
-    ::Thrift::Struct.field_accessor self, :db_name, :tbl_name, :max_parts
     FIELDS = {
       DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
       TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
@@ -1400,15 +2078,15 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_partitions_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O1 = 1
     O2 = 2
 
-    ::Thrift::Struct.field_accessor self, :success, :o1, :o2
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => Partition}},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => NoSuchObjectException},
@@ -1420,15 +2098,15 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_partition_names_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DB_NAME = 1
     TBL_NAME = 2
     MAX_PARTS = 3
 
-    ::Thrift::Struct.field_accessor self, :db_name, :tbl_name, :max_parts
     FIELDS = {
       DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
       TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
@@ -1440,14 +2118,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Get_partition_names_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     O2 = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :o2
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
       O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
@@ -1458,15 +2136,137 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_partitions_ps_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    PART_VALS = 3
+    MAX_PARTS = 4
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      PART_VALS => {:type => ::Thrift::Types::LIST, :name => 'part_vals', :element => {:type => ::Thrift::Types::STRING}},
+      MAX_PARTS => {:type => ::Thrift::Types::I16, :name => 'max_parts', :default => -1}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_partitions_ps_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => Partition}},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_partition_names_ps_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    PART_VALS = 3
+    MAX_PARTS = 4
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      PART_VALS => {:type => ::Thrift::Types::LIST, :name => 'part_vals', :element => {:type => ::Thrift::Types::STRING}},
+      MAX_PARTS => {:type => ::Thrift::Types::I16, :name => 'max_parts', :default => -1}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_partition_names_ps_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_partitions_by_filter_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    FILTER = 3
+    MAX_PARTS = 4
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      FILTER => {:type => ::Thrift::Types::STRING, :name => 'filter'},
+      MAX_PARTS => {:type => ::Thrift::Types::I16, :name => 'max_parts', :default => -1}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_partitions_by_filter_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+    O2 = 2
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => Partition}},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => NoSuchObjectException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Alter_partition_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     DB_NAME = 1
     TBL_NAME = 2
     NEW_PART = 3
 
-    ::Thrift::Struct.field_accessor self, :db_name, :tbl_name, :new_part
     FIELDS = {
       DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
       TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
@@ -1478,14 +2278,14 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Alter_partition_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     O1 = 1
     O2 = 2
 
-    ::Thrift::Struct.field_accessor self, :o1, :o2
     FIELDS = {
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => InvalidOperationException},
       O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
@@ -1496,6 +2296,311 @@ module ThriftHiveMetastore
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_config_value_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    NAME = 1
+    DEFAULTVALUE = 2
+
+    FIELDS = {
+      NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
+      DEFAULTVALUE => {:type => ::Thrift::Types::STRING, :name => 'defaultValue'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_config_value_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::STRING, :name => 'success'},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => ConfigValSecurityException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Partition_name_to_vals_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    PART_NAME = 1
+
+    FIELDS = {
+      PART_NAME => {:type => ::Thrift::Types::STRING, :name => 'part_name'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Partition_name_to_vals_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Partition_name_to_spec_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    PART_NAME = 1
+
+    FIELDS = {
+      PART_NAME => {:type => ::Thrift::Types::STRING, :name => 'part_name'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Partition_name_to_spec_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::MAP, :name => 'success', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Add_index_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    NEW_INDEX = 1
+    INDEX_TABLE = 2
+
+    FIELDS = {
+      NEW_INDEX => {:type => ::Thrift::Types::STRUCT, :name => 'new_index', :class => Index},
+      INDEX_TABLE => {:type => ::Thrift::Types::STRUCT, :name => 'index_table', :class => Table}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Add_index_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+    O2 = 2
+    O3 = 3
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Index},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => InvalidObjectException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => AlreadyExistsException},
+      O3 => {:type => ::Thrift::Types::STRUCT, :name => 'o3', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Drop_index_by_name_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    INDEX_NAME = 3
+    DELETEDATA = 4
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      INDEX_NAME => {:type => ::Thrift::Types::STRING, :name => 'index_name'},
+      DELETEDATA => {:type => ::Thrift::Types::BOOL, :name => 'deleteData'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Drop_index_by_name_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+    O2 = 2
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::BOOL, :name => 'success'},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => NoSuchObjectException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_index_by_name_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    INDEX_NAME = 3
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      INDEX_NAME => {:type => ::Thrift::Types::STRING, :name => 'index_name'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_index_by_name_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+    O2 = 2
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Index},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => MetaException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => NoSuchObjectException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_indexes_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    MAX_INDEXES = 3
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      MAX_INDEXES => {:type => ::Thrift::Types::I16, :name => 'max_indexes', :default => -1}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_indexes_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O1 = 1
+    O2 = 2
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => Index}},
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => NoSuchObjectException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_index_names_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_NAME = 2
+    MAX_INDEXES = 3
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+      MAX_INDEXES => {:type => ::Thrift::Types::I16, :name => 'max_indexes', :default => -1}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_index_names_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    O2 = 1
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
   end
 
 end

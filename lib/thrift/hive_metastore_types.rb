@@ -6,12 +6,12 @@
 
 require File.join(File.dirname(__FILE__), *%w[fb303_types])
 
+
 class Version
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   VERSION = 1
   COMMENTS = 2
 
-  ::Thrift::Struct.field_accessor self, :version, :comments
   FIELDS = {
     VERSION => {:type => ::Thrift::Types::STRING, :name => 'version'},
     COMMENTS => {:type => ::Thrift::Types::STRING, :name => 'comments'}
@@ -22,15 +22,15 @@ class Version
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class FieldSchema
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   NAME = 1
   TYPE = 2
   COMMENT = 3
 
-  ::Thrift::Struct.field_accessor self, :name, :type, :comment
   FIELDS = {
     NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
     TYPE => {:type => ::Thrift::Types::STRING, :name => 'type'},
@@ -42,21 +42,21 @@ class FieldSchema
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Type
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   NAME = 1
   TYPE1 = 2
   TYPE2 = 3
-  F = 4
+  FIELDS = 4
 
-  ::Thrift::Struct.field_accessor self, :name, :type1, :type2, :fields
   FIELDS = {
     NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
     TYPE1 => {:type => ::Thrift::Types::STRING, :name => 'type1', :optional => true},
     TYPE2 => {:type => ::Thrift::Types::STRING, :name => 'type2', :optional => true},
-    F => {:type => ::Thrift::Types::LIST, :name => 'fields', :element => {:type => ::Thrift::Types::STRUCT, :class => FieldSchema}, :optional => true}
+    FIELDS => {:type => ::Thrift::Types::LIST, :name => 'fields', :element => {:type => ::Thrift::Types::STRUCT, :class => FieldSchema}, :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -64,17 +64,19 @@ class Type
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Database
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   NAME = 1
   DESCRIPTION = 2
+  LOCATIONURI = 3
 
-  ::Thrift::Struct.field_accessor self, :name, :description
   FIELDS = {
     NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
-    DESCRIPTION => {:type => ::Thrift::Types::STRING, :name => 'description'}
+    DESCRIPTION => {:type => ::Thrift::Types::STRING, :name => 'description'},
+    LOCATIONURI => {:type => ::Thrift::Types::STRING, :name => 'locationUri'}
   }
 
   def struct_fields; FIELDS; end
@@ -82,15 +84,15 @@ class Database
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class SerDeInfo
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   NAME = 1
   SERIALIZATIONLIB = 2
   PARAMETERS = 3
 
-  ::Thrift::Struct.field_accessor self, :name, :serializationLib, :parameters
   FIELDS = {
     NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
     SERIALIZATIONLIB => {:type => ::Thrift::Types::STRING, :name => 'serializationLib'},
@@ -102,14 +104,14 @@ class SerDeInfo
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Order
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   COL = 1
   ORDER = 2
 
-  ::Thrift::Struct.field_accessor self, :col, :order
   FIELDS = {
     COL => {:type => ::Thrift::Types::STRING, :name => 'col'},
     ORDER => {:type => ::Thrift::Types::I32, :name => 'order'}
@@ -120,10 +122,11 @@ class Order
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class StorageDescriptor
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   COLS = 1
   LOCATION = 2
   INPUTFORMAT = 3
@@ -135,7 +138,6 @@ class StorageDescriptor
   SORTCOLS = 9
   PARAMETERS = 10
 
-  ::Thrift::Struct.field_accessor self, :cols, :location, :inputFormat, :outputFormat, :compressed, :numBuckets, :serdeInfo, :bucketCols, :sortCols, :parameters
   FIELDS = {
     COLS => {:type => ::Thrift::Types::LIST, :name => 'cols', :element => {:type => ::Thrift::Types::STRUCT, :class => FieldSchema}},
     LOCATION => {:type => ::Thrift::Types::STRING, :name => 'location'},
@@ -154,10 +156,11 @@ class StorageDescriptor
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Table
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   TABLENAME = 1
   DBNAME = 2
   OWNER = 3
@@ -167,8 +170,10 @@ class Table
   SD = 7
   PARTITIONKEYS = 8
   PARAMETERS = 9
+  VIEWORIGINALTEXT = 10
+  VIEWEXPANDEDTEXT = 11
+  TABLETYPE = 12
 
-  ::Thrift::Struct.field_accessor self, :tableName, :dbName, :owner, :createTime, :lastAccessTime, :retention, :sd, :partitionKeys, :parameters
   FIELDS = {
     TABLENAME => {:type => ::Thrift::Types::STRING, :name => 'tableName'},
     DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbName'},
@@ -178,7 +183,10 @@ class Table
     RETENTION => {:type => ::Thrift::Types::I32, :name => 'retention'},
     SD => {:type => ::Thrift::Types::STRUCT, :name => 'sd', :class => StorageDescriptor},
     PARTITIONKEYS => {:type => ::Thrift::Types::LIST, :name => 'partitionKeys', :element => {:type => ::Thrift::Types::STRUCT, :class => FieldSchema}},
-    PARAMETERS => {:type => ::Thrift::Types::MAP, :name => 'parameters', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}}
+    PARAMETERS => {:type => ::Thrift::Types::MAP, :name => 'parameters', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}},
+    VIEWORIGINALTEXT => {:type => ::Thrift::Types::STRING, :name => 'viewOriginalText'},
+    VIEWEXPANDEDTEXT => {:type => ::Thrift::Types::STRING, :name => 'viewExpandedText'},
+    TABLETYPE => {:type => ::Thrift::Types::STRING, :name => 'tableType'}
   }
 
   def struct_fields; FIELDS; end
@@ -186,10 +194,11 @@ class Table
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Partition
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   VALUES = 1
   DBNAME = 2
   TABLENAME = 3
@@ -198,7 +207,6 @@ class Partition
   SD = 6
   PARAMETERS = 7
 
-  ::Thrift::Struct.field_accessor self, :values, :dbName, :tableName, :createTime, :lastAccessTime, :sd, :parameters
   FIELDS = {
     VALUES => {:type => ::Thrift::Types::LIST, :name => 'values', :element => {:type => ::Thrift::Types::STRING}},
     DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbName'},
@@ -214,25 +222,33 @@ class Partition
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Index
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   INDEXNAME = 1
-  INDEXTYPE = 2
-  TABLENAME = 3
-  DBNAME = 4
-  COLNAMES = 5
-  PARTNAME = 6
+  INDEXHANDLERCLASS = 2
+  DBNAME = 3
+  ORIGTABLENAME = 4
+  CREATETIME = 5
+  LASTACCESSTIME = 6
+  INDEXTABLENAME = 7
+  SD = 8
+  PARAMETERS = 9
+  DEFERREDREBUILD = 10
 
-  ::Thrift::Struct.field_accessor self, :indexName, :indexType, :tableName, :dbName, :colNames, :partName
   FIELDS = {
     INDEXNAME => {:type => ::Thrift::Types::STRING, :name => 'indexName'},
-    INDEXTYPE => {:type => ::Thrift::Types::I32, :name => 'indexType'},
-    TABLENAME => {:type => ::Thrift::Types::STRING, :name => 'tableName'},
+    INDEXHANDLERCLASS => {:type => ::Thrift::Types::STRING, :name => 'indexHandlerClass'},
     DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbName'},
-    COLNAMES => {:type => ::Thrift::Types::LIST, :name => 'colNames', :element => {:type => ::Thrift::Types::STRING}},
-    PARTNAME => {:type => ::Thrift::Types::STRING, :name => 'partName'}
+    ORIGTABLENAME => {:type => ::Thrift::Types::STRING, :name => 'origTableName'},
+    CREATETIME => {:type => ::Thrift::Types::I32, :name => 'createTime'},
+    LASTACCESSTIME => {:type => ::Thrift::Types::I32, :name => 'lastAccessTime'},
+    INDEXTABLENAME => {:type => ::Thrift::Types::STRING, :name => 'indexTableName'},
+    SD => {:type => ::Thrift::Types::STRUCT, :name => 'sd', :class => StorageDescriptor},
+    PARAMETERS => {:type => ::Thrift::Types::MAP, :name => 'parameters', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}},
+    DEFERREDREBUILD => {:type => ::Thrift::Types::BOOL, :name => 'deferredRebuild'}
   }
 
   def struct_fields; FIELDS; end
@@ -240,14 +256,14 @@ class Index
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Schema
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   FIELDSCHEMAS = 1
   PROPERTIES = 2
 
-  ::Thrift::Struct.field_accessor self, :fieldSchemas, :properties
   FIELDS = {
     FIELDSCHEMAS => {:type => ::Thrift::Types::LIST, :name => 'fieldSchemas', :element => {:type => ::Thrift::Types::STRUCT, :class => FieldSchema}},
     PROPERTIES => {:type => ::Thrift::Types::MAP, :name => 'properties', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}}
@@ -258,10 +274,11 @@ class Schema
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class MetaException < ::Thrift::Exception
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   def initialize(message=nil)
     super()
     self.message = message
@@ -269,7 +286,6 @@ class MetaException < ::Thrift::Exception
 
   MESSAGE = 1
 
-  ::Thrift::Struct.field_accessor self, :message
   FIELDS = {
     MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
   }
@@ -279,10 +295,11 @@ class MetaException < ::Thrift::Exception
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class UnknownTableException < ::Thrift::Exception
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   def initialize(message=nil)
     super()
     self.message = message
@@ -290,7 +307,6 @@ class UnknownTableException < ::Thrift::Exception
 
   MESSAGE = 1
 
-  ::Thrift::Struct.field_accessor self, :message
   FIELDS = {
     MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
   }
@@ -300,10 +316,11 @@ class UnknownTableException < ::Thrift::Exception
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class UnknownDBException < ::Thrift::Exception
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   def initialize(message=nil)
     super()
     self.message = message
@@ -311,7 +328,6 @@ class UnknownDBException < ::Thrift::Exception
 
   MESSAGE = 1
 
-  ::Thrift::Struct.field_accessor self, :message
   FIELDS = {
     MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
   }
@@ -321,10 +337,11 @@ class UnknownDBException < ::Thrift::Exception
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class AlreadyExistsException < ::Thrift::Exception
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   def initialize(message=nil)
     super()
     self.message = message
@@ -332,7 +349,6 @@ class AlreadyExistsException < ::Thrift::Exception
 
   MESSAGE = 1
 
-  ::Thrift::Struct.field_accessor self, :message
   FIELDS = {
     MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
   }
@@ -342,10 +358,11 @@ class AlreadyExistsException < ::Thrift::Exception
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class InvalidObjectException < ::Thrift::Exception
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   def initialize(message=nil)
     super()
     self.message = message
@@ -353,7 +370,6 @@ class InvalidObjectException < ::Thrift::Exception
 
   MESSAGE = 1
 
-  ::Thrift::Struct.field_accessor self, :message
   FIELDS = {
     MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
   }
@@ -363,10 +379,11 @@ class InvalidObjectException < ::Thrift::Exception
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class NoSuchObjectException < ::Thrift::Exception
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   def initialize(message=nil)
     super()
     self.message = message
@@ -374,7 +391,6 @@ class NoSuchObjectException < ::Thrift::Exception
 
   MESSAGE = 1
 
-  ::Thrift::Struct.field_accessor self, :message
   FIELDS = {
     MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
   }
@@ -384,10 +400,11 @@ class NoSuchObjectException < ::Thrift::Exception
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class IndexAlreadyExistsException < ::Thrift::Exception
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   def initialize(message=nil)
     super()
     self.message = message
@@ -395,7 +412,6 @@ class IndexAlreadyExistsException < ::Thrift::Exception
 
   MESSAGE = 1
 
-  ::Thrift::Struct.field_accessor self, :message
   FIELDS = {
     MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
   }
@@ -405,10 +421,11 @@ class IndexAlreadyExistsException < ::Thrift::Exception
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class InvalidOperationException < ::Thrift::Exception
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   def initialize(message=nil)
     super()
     self.message = message
@@ -416,7 +433,6 @@ class InvalidOperationException < ::Thrift::Exception
 
   MESSAGE = 1
 
-  ::Thrift::Struct.field_accessor self, :message
   FIELDS = {
     MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
   }
@@ -426,5 +442,27 @@ class InvalidOperationException < ::Thrift::Exception
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
+end
+
+class ConfigValSecurityException < ::Thrift::Exception
+  include ::Thrift::Struct, ::Thrift::Struct_Union
+  def initialize(message=nil)
+    super()
+    self.message = message
+  end
+
+  MESSAGE = 1
+
+  FIELDS = {
+    MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
+  }
+
+  def struct_fields; FIELDS; end
+
+  def validate
+  end
+
+  ::Thrift::Struct.generate_accessors self
 end
 

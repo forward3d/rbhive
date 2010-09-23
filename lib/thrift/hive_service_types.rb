@@ -6,6 +6,7 @@
 
 require File.join(File.dirname(__FILE__), *%w[fb303_types])
 require File.join(File.dirname(__FILE__), *%w[hive_metastore_types])
+require File.join(File.dirname(__FILE__), *%w[queryplan_types])
 
 
 module JobTrackerState
@@ -16,7 +17,7 @@ module JobTrackerState
 end
 
 class HiveClusterStatus
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   TASKTRACKERS = 1
   MAPTASKS = 2
   REDUCETASKS = 3
@@ -24,7 +25,6 @@ class HiveClusterStatus
   MAXREDUCETASKS = 5
   STATE = 6
 
-  ::Thrift::Struct.field_accessor self, :taskTrackers, :mapTasks, :reduceTasks, :maxMapTasks, :maxReduceTasks, :state
   FIELDS = {
     TASKTRACKERS => {:type => ::Thrift::Types::I32, :name => 'taskTrackers'},
     MAPTASKS => {:type => ::Thrift::Types::I32, :name => 'mapTasks'},
@@ -42,20 +42,19 @@ class HiveClusterStatus
     end
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class HiveServerException < ::Thrift::Exception
-  include ::Thrift::Struct
-  def initialize(message=nil)
-    super()
-    self.message = message
-  end
-
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   MESSAGE = 1
+  ERRORCODE = 2
+  SQLSTATE = 3
 
-  ::Thrift::Struct.field_accessor self, :message
   FIELDS = {
-    MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'}
+    MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'},
+    ERRORCODE => {:type => ::Thrift::Types::I32, :name => 'errorCode'},
+    SQLSTATE => {:type => ::Thrift::Types::STRING, :name => 'SQLState'}
   }
 
   def struct_fields; FIELDS; end
@@ -63,5 +62,6 @@ class HiveServerException < ::Thrift::Exception
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 

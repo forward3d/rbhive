@@ -6,6 +6,13 @@
 
 require File.join(File.dirname(__FILE__), *%w[hive_metastore_types])
 
+
+DDL_TIME = %q"transient_lastDdlTime"
+
+IS_ARCHIVED = %q"is_archived"
+
+ORIGINAL_LOCATION = %q"original_location"
+
 META_TABLE_COLUMNS = %q"columns"
 
 META_TABLE_COLUMN_TYPES = %q"columns.types"
@@ -29,4 +36,6 @@ META_TABLE_PARTITION_COLUMNS = %q"partition_columns"
 FILE_INPUT_FORMAT = %q"file.inputformat"
 
 FILE_OUTPUT_FORMAT = %q"file.outputformat"
+
+META_TABLE_STORAGE = %q"storage_handler"
 

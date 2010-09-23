@@ -123,6 +123,22 @@ module ThriftHive
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'getClusterStatus failed: unknown result')
     end
 
+    def getQueryPlan()
+      send_getQueryPlan()
+      return recv_getQueryPlan()
+    end
+
+    def send_getQueryPlan()
+      send_message('getQueryPlan', GetQueryPlan_args)
+    end
+
+    def recv_getQueryPlan()
+      result = receive_message(GetQueryPlan_result)
+      return result.success unless result.success.nil?
+      raise result.ex unless result.ex.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'getQueryPlan failed: unknown result')
+    end
+
   end
 
   class Processor < ThriftHiveMetastore::Processor 
@@ -205,15 +221,25 @@ module ThriftHive
       write_result(result, oprot, 'getClusterStatus', seqid)
     end
 
+    def process_getQueryPlan(seqid, iprot, oprot)
+      args = read_args(iprot, GetQueryPlan_args)
+      result = GetQueryPlan_result.new()
+      begin
+        result.success = @handler.getQueryPlan()
+      rescue HiveServerException => ex
+        result.ex = ex
+      end
+      write_result(result, oprot, 'getQueryPlan', seqid)
+    end
+
   end
 
   # HELPER FUNCTIONS AND STRUCTURES
 
   class Execute_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     QUERY = 1
 
-    ::Thrift::Struct.field_accessor self, :query
     FIELDS = {
       QUERY => {:type => ::Thrift::Types::STRING, :name => 'query'}
     }
@@ -223,13 +249,13 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Execute_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     EX = 1
 
-    ::Thrift::Struct.field_accessor self, :ex
     FIELDS = {
       EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => HiveServerException}
     }
@@ -239,10 +265,11 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class FetchOne_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -253,14 +280,14 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class FetchOne_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     EX = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :ex
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRING, :name => 'success'},
       EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => HiveServerException}
@@ -271,13 +298,13 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class FetchN_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     NUMROWS = 1
 
-    ::Thrift::Struct.field_accessor self, :numRows
     FIELDS = {
       NUMROWS => {:type => ::Thrift::Types::I32, :name => 'numRows'}
     }
@@ -287,14 +314,14 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class FetchN_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     EX = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :ex
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
       EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => HiveServerException}
@@ -305,10 +332,11 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class FetchAll_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -319,14 +347,14 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class FetchAll_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     EX = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :ex
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}},
       EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => HiveServerException}
@@ -337,10 +365,11 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetSchema_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -351,14 +380,14 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetSchema_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     EX = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :ex
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Schema},
       EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => HiveServerException}
@@ -369,10 +398,11 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetThriftSchema_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -383,14 +413,14 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetThriftSchema_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     EX = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :ex
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Schema},
       EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => HiveServerException}
@@ -401,10 +431,11 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetClusterStatus_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -415,14 +446,14 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetClusterStatus_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
     EX = 1
 
-    ::Thrift::Struct.field_accessor self, :success, :ex
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => HiveClusterStatus},
       EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => HiveServerException}
@@ -433,6 +464,40 @@ module ThriftHive
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class GetQueryPlan_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+
+    FIELDS = {
+
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class GetQueryPlan_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    EX = 1
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => QueryPlan},
+      EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => HiveServerException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
   end
 
 end

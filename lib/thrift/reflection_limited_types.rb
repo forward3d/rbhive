@@ -25,11 +25,10 @@ module TTypeTag
 end
 
 class SimpleType
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   TTYPE = 1
   NAME = 2
 
-  ::Thrift::Struct.field_accessor self, :ttype, :name
   FIELDS = {
     TTYPE => {:type => ::Thrift::Types::I32, :name => 'ttype', :enum_class => TTypeTag},
     NAME => {:type => ::Thrift::Types::STRING, :name => 'name'}
@@ -43,15 +42,15 @@ class SimpleType
     end
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class ContainerType
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   TTYPE = 1
   SUBTYPE1 = 2
   SUBTYPE2 = 3
 
-  ::Thrift::Struct.field_accessor self, :ttype, :subtype1, :subtype2
   FIELDS = {
     TTYPE => {:type => ::Thrift::Types::I32, :name => 'ttype', :enum_class => TTypeTag},
     SUBTYPE1 => {:type => ::Thrift::Types::STRUCT, :name => 'subtype1', :class => SimpleType},
@@ -66,15 +65,15 @@ class ContainerType
     end
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class ThriftType
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   IS_CONTAINER = 1
   SIMPLE_TYPE = 2
   CONTAINER_TYPE = 3
 
-  ::Thrift::Struct.field_accessor self, :is_container, :simple_type, :container_type
   FIELDS = {
     IS_CONTAINER => {:type => ::Thrift::Types::BOOL, :name => 'is_container'},
     SIMPLE_TYPE => {:type => ::Thrift::Types::STRUCT, :name => 'simple_type', :class => SimpleType, :optional => true},
@@ -86,15 +85,15 @@ class ThriftType
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Argument
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   KEY = 1
   NAME = 2
   TYPE = 3
 
-  ::Thrift::Struct.field_accessor self, :key, :name, :type
   FIELDS = {
     KEY => {:type => ::Thrift::Types::I16, :name => 'key'},
     NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
@@ -106,15 +105,15 @@ class Argument
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Method
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   NAME = 1
   RETURN_TYPE = 2
   ARGUMENTS = 3
 
-  ::Thrift::Struct.field_accessor self, :name, :return_type, :arguments
   FIELDS = {
     NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
     RETURN_TYPE => {:type => ::Thrift::Types::STRUCT, :name => 'return_type', :class => ThriftType},
@@ -126,15 +125,15 @@ class Method
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 
 class Service
-  include ::Thrift::Struct
+  include ::Thrift::Struct, ::Thrift::Struct_Union
   NAME = 1
   METHODS = 2
   FULLY_REFLECTED = 3
 
-  ::Thrift::Struct.field_accessor self, :name, :methods, :fully_reflected
   FIELDS = {
     NAME => {:type => ::Thrift::Types::STRING, :name => 'name'},
     METHODS => {:type => ::Thrift::Types::LIST, :name => 'methods', :element => {:type => ::Thrift::Types::STRUCT, :class => Method}},
@@ -146,5 +145,6 @@ class Service
   def validate
   end
 
+  ::Thrift::Struct.generate_accessors self
 end
 

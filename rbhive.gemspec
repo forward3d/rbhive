@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
   s.name = "rbhive"
-  s.version = "0.1.1"
+  s.version = "0.1.3"
   s.authors = ["Andy Kent", "Paul Ingles"]
-  s.date = %q{2010-03-31}
+  s.date = %q{2010-09-23}
   s.description = "Simple lib for executing Hive queries"
   s.summary = "Simple lib for executing Hive queries"
   s.email = "andy@forward.co.uk"
@@ -16,6 +16,8 @@ Gem::Specification.new do |s|
     "lib/thrift/hive_metastore_types.rb",
     "lib/thrift/hive_service_constants.rb",
     "lib/thrift/hive_service_types.rb",
+    "lib/thrift/queryplan_constants.rb",
+    "lib/thrift/queryplan_types.rb",
     "lib/thrift/reflection_limited_constants.rb",
     "lib/thrift/reflection_limited_types.rb",
     "lib/thrift/serde_constants.rb",
@@ -26,5 +28,6 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/trfficbroker/rbhive}
   s.require_paths = ["lib"]
   s.rubygems_version = "1.3.5"
-  s.add_dependency 'thrift'
+  s.add_dependency('thrift', '>= 0.4.0')
+  
 end

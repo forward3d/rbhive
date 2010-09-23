@@ -7,6 +7,7 @@
 require 'thrift'
 require File.join(File.dirname(__FILE__), *%w[fb303_types])
 
+
 module FacebookService
   class Client
     include ::Thrift::Client
@@ -288,7 +289,7 @@ module FacebookService
   # HELPER FUNCTIONS AND STRUCTURES
 
   class GetName_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -299,13 +300,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetName_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRING, :name => 'success'}
     }
@@ -315,10 +316,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetVersion_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -329,13 +331,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetVersion_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRING, :name => 'success'}
     }
@@ -345,10 +347,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetStatus_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -359,13 +362,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetStatus_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::I32, :name => 'success', :enum_class => Fb_status}
     }
@@ -378,10 +381,11 @@ module FacebookService
       end
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetStatusDetails_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -392,13 +396,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetStatusDetails_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRING, :name => 'success'}
     }
@@ -408,10 +412,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetCounters_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -422,13 +427,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetCounters_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::MAP, :name => 'success', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::I64}}
     }
@@ -438,13 +443,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetCounter_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     KEY = 1
 
-    ::Thrift::Struct.field_accessor self, :key
     FIELDS = {
       KEY => {:type => ::Thrift::Types::STRING, :name => 'key'}
     }
@@ -454,13 +459,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetCounter_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::I64, :name => 'success'}
     }
@@ -470,14 +475,14 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class SetOption_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     KEY = 1
     VALUE = 2
 
-    ::Thrift::Struct.field_accessor self, :key, :value
     FIELDS = {
       KEY => {:type => ::Thrift::Types::STRING, :name => 'key'},
       VALUE => {:type => ::Thrift::Types::STRING, :name => 'value'}
@@ -488,10 +493,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class SetOption_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -502,13 +508,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetOption_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     KEY = 1
 
-    ::Thrift::Struct.field_accessor self, :key
     FIELDS = {
       KEY => {:type => ::Thrift::Types::STRING, :name => 'key'}
     }
@@ -518,13 +524,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetOption_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRING, :name => 'success'}
     }
@@ -534,10 +540,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetOptions_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -548,13 +555,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetOptions_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::MAP, :name => 'success', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}}
     }
@@ -564,13 +571,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetCpuProfile_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     PROFILEDURATIONINSEC = 1
 
-    ::Thrift::Struct.field_accessor self, :profileDurationInSec
     FIELDS = {
       PROFILEDURATIONINSEC => {:type => ::Thrift::Types::I32, :name => 'profileDurationInSec'}
     }
@@ -580,13 +587,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class GetCpuProfile_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRING, :name => 'success'}
     }
@@ -596,10 +603,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class AliveSince_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -610,13 +618,13 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class AliveSince_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
 
-    ::Thrift::Struct.field_accessor self, :success
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::I64, :name => 'success'}
     }
@@ -626,10 +634,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Reinitialize_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -640,10 +649,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Reinitialize_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -654,10 +664,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Shutdown_args
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -668,10 +679,11 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
   class Shutdown_result
-    include ::Thrift::Struct
+    include ::Thrift::Struct, ::Thrift::Struct_Union
 
     FIELDS = {
 
@@ -682,6 +694,7 @@ module FacebookService
     def validate
     end
 
+    ::Thrift::Struct.generate_accessors self
   end
 
 end
