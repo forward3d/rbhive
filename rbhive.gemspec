@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
   s.name = "rbhive"
-  s.version = "0.1.3"
-  s.authors = ["Andy Kent", "Paul Ingles"]
-  s.date = %q{2010-09-23}
+  s.version = "0.1.4"
+  s.authors = ["Forward Internet Group"]
+  s.date = %q{2010-09-29}
   s.description = "Simple lib for executing Hive queries"
   s.summary = "Simple lib for executing Hive queries"
   s.email = "andy@forward.co.uk"
@@ -29,5 +29,4 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = "1.3.5"
   s.add_dependency('thrift', '>= 0.4.0')
-  
 end

@@ -14,13 +14,22 @@ module RBHive
   end
   module_function :connect
   
+  class StdOutLogger
+    %w(fatal error warn info debug).each do |level| 
+      define_method level.to_sym do |message|
+        STDOUT.puts(message)
+     end
+   end
+  end
+  
   class Connection
     attr_reader :client
-    def initialize(server, port=10_000)
+    def initialize(server, port=10_000, logger=StdOutLogger.new)
       @socket = Thrift::Socket.new(server, port)
       @transport = Thrift::BufferedTransport.new(@socket)
       @protocol = Thrift::BinaryProtocol.new(@transport)
       @client = ThriftHive::Client.new(@protocol)
+      @logger = logger
     end
     
     def open
@@ -36,6 +45,7 @@ module RBHive
     end
     
     def execute(query)
+      @logger.info("Executing Hive Query: #{query}")
       client.execute(query)
     end
     
