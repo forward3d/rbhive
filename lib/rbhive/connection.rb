@@ -24,6 +24,7 @@ module RBHive
   
   class Connection
     attr_reader :client
+    
     def initialize(server, port=10_000, logger=StdOutLogger.new)
       @socket = Thrift::Socket.new(server, port)
       @transport = Thrift::BufferedTransport.new(@socket)
@@ -57,6 +58,19 @@ module RBHive
     def first(query)
       execute(query)
       ResultSet.new([client.fetchOne])
+    end
+    
+    def create_table(schema)
+      execute(schema.create_table_statement)
+    end
+    
+    def drop_table(name)
+      name = name.name if name.is_a?(TableSchema)
+      execute("DROP TABLE `#{name}`")
+    end
+    
+    def replace_columns(schema)
+      execute(schema.replace_columns_statement)
     end
     
     def method_missing(meth, *args)
