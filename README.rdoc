@@ -1,0 +1,61 @@
+= RBHive -- Ruby thrift lib for executing Hive queries
+
+A simple library to execute Hive queries against the Hive thrift server.
+
+== Example to fetch some results
+
+  require 'rubygems'
+  require 'rbhive'
+
+  RBHive.connect('hive.server.address') do |connection|
+    connection.fetch 'SELECT * FROM cities'
+  end
+  ➔ [["London", "UK"], ["New York", "USA"], ["Mumbai", "India"]]
+
+== Example to execute a query 
+
+  require 'rubygems'
+  require 'rbhive'
+
+  RBHive.connect('hive.server.address') do |connection|
+    connection.execute 'DROP TABLE cities'
+  end
+  ➔ nil
+
+== Example on how to create and/or drop tables
+
+  require 'rubygems'
+  require 'rbhive'
+
+  table = TableSchema.new('person', 'List of people that owe me money') do
+    column 'name', :string, 'Full name of debtor'
+    column 'address', :string, 'Address of debtor'
+    column 'amount', :float, 'The amount of money borrowed'
+
+    partition 'dated', :string, 'The date money was given'
+    partition 'country', :string, 'The country the person resides in'
+  end
+
+  RBHive.connect('hive.server.address') do |connection|
+    connection.create_table(table)
+    connection.remove_table(table)
+  end  
+
+== Example on how to modify table schema
+
+  require 'rubygems'
+  require 'rbhive'
+
+  table = TableSchema.new('person', 'List of people that owe me money') do
+    column 'name', :string, 'Full name of debtor'
+    column 'address', :string, 'Address of debtor'
+    column 'amount', :float, 'The amount of money borrowed'
+    column 'new_amount', :float, 'The new amount this person somehow convinced me to give them'
+
+    partition 'dated', :string, 'The date money was given'
+    partition 'country', :string, 'The country the person resides in'
+  end
+
+  RBHive.connect('hive.server.address') do |connection|
+    connection.replace_columns(table)
+  end  
