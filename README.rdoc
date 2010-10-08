@@ -38,7 +38,7 @@ A simple library to execute Hive queries against the Hive thrift server.
 
   RBHive.connect('hive.server.address') do |connection|
     connection.create_table(table)
-    connection.remove_table(table)
+    connection.drop_table(table)
   end  
 
 == Example on how to modify table schema
