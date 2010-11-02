@@ -73,6 +73,10 @@ module RBHive
       execute(schema.replace_columns_statement)
     end
     
+    def add_columns(schema)
+      execute(schema.add_columns_statement)
+    end
+    
     def method_missing(meth, *args)
       client.send(meth, *args)
     end

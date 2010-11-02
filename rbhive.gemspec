@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
   s.name = "rbhive"
-  s.version = "0.1.5"
+  s.version = "0.1.6"
   s.authors = ["Forward Internet Group"]
-  s.date = %q{2010-10-01}
+  s.date = %q{2010-11-02}
   s.description = "Simple lib for executing Hive queries"
   s.summary = "Simple lib for executing Hive queries"
   s.email = "andy@forward.co.uk"

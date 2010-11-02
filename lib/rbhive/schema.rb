@@ -24,8 +24,12 @@ LINES TERMINATED BY '#{@line_sep}'
 STORED AS TEXTFILE]
   end
   
-  def replace_columns_statement()
-    %[ALTER TABLE `#{name}` REPLACE COLUMNS #{column_statement}]
+  def replace_columns_statement
+    alter_columns_statement("REPLACE")
+  end
+  
+  def add_columns_statement
+    alter_columns_statement("ADD")
   end
   
   def to_s
@@ -37,6 +41,10 @@ STORED AS TEXTFILE]
   def table_statement
     comment_string = (@comment.nil? ? '' : " COMMENT '#{@comment}'")
     %[`#{@name}` #{column_statement}#{comment_string}\n#{partition_statement}]
+  end
+  
+  def alter_columns_statement(add_or_replace)
+    %[ALTER TABLE `#{name}` #{add_or_replace} COLUMNS #{column_statement}]
   end
   
   def column_statement
