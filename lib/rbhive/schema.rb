@@ -53,6 +53,8 @@ STORED AS TEXTFILE]
   end
   
   def partition_statement
+    return "" if @partitions.nil? || @partitions.empty?
+    
     cols = @partitions.join(",\n")
     "PARTITIONED BY (\n#{cols}\n)"
   end
