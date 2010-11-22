@@ -31,6 +31,7 @@ module RBHive
       @protocol = Thrift::BinaryProtocol.new(@transport)
       @client = ThriftHive::Client.new(@protocol)
       @logger = logger
+      @logger.info("Connecting to #{server} on port #{port}")
     end
     
     def open
