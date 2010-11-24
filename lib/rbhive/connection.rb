@@ -99,9 +99,9 @@ module RBHive
     private
     
     def output(sep, out_file)
-      tsv = self.map { |r| r.join("\t") }.join("\n")
-      return tsv if out_file.nil?
-      File.open(out_file, 'w') { |f| f << tsv }
+      sv = self.map { |r| r.join(sep) }.join("\n")
+      return sv if out_file.nil?
+      File.open(out_file, 'w') { |f| f << sv }
     end
   end
 end
