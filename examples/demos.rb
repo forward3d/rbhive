@@ -1,7 +1,7 @@
 require "rubygems"
 require File.join(File.dirname(__FILE__), *%w[.. lib rbhive])
 
-puts RBHive.connect('hive.hadoop.forward.co.uk', 10001) {|db| 
+puts RBHive.connect('hive.hadoop.forward.co.uk') {|db| 
   db.priority='VERY_LOW'
   
   p db.fetch %[
