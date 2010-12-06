@@ -55,6 +55,10 @@ module RBHive
       set("mapred.job.priority", priority)
     end
     
+    def queue=(queue)
+      set("mapred.job.queue.name", queue)
+    end
+    
     def set(name,value)
       @logger.info("Setting #{name}=#{value}")
       client.execute("SET #{name}=#{value}")
