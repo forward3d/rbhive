@@ -51,6 +51,15 @@ module RBHive
       client.execute(query)
     end
     
+    def priority=(priority)
+      set("mapred.job.priority", priority)
+    end
+    
+    def set(name,value)
+      @logger.info("Setting #{name}=#{value}")
+      client.execute("SET #{name}=#{value}")
+    end
+    
     def fetch(query)
       execute(query)
       ResultSet.new(client.fetchAll)
@@ -99,10 +108,9 @@ module RBHive
     private
     
     def output(sep, out_file)
-      sv = self.map { |r| r.join(sep) }.join("\n")
+      sv = self.map { |r| r.join("\"" + sep + "\"") }.join("\n")
       return sv if out_file.nil?
       File.open(out_file, 'w') { |f| f << sv }
     end
   end
 end
-
