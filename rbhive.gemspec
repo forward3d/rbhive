@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "rbhive"
-  s.version = "0.1.16"
+  s.version = "0.1.17"
   s.authors = ["Forward Internet Group"]
   s.date = %q{2010-12-07}
   s.description = "Simple lib for executing Hive queries"

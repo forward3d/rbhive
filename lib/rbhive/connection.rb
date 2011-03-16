@@ -77,7 +77,7 @@ module RBHive
     def fetch_in_batch(query, batch_size=100)
       execute(query)
       until (next_batch = client.fetchN(batch_size)).empty?
-        yield next_batch
+        yield ResultSet.new(next_batch)
       end
     end
     
