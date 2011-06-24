@@ -1,8 +1,8 @@
 class TableSchema
   attr_accessor :name
   attr_reader :columns, :partitions
-  def initialize(name, comment=nil, field_sep='\t', line_sep='\n', &blk)
-    @name, @comment, @field_sep, @line_sep = name, comment, field_sep, line_sep
+  def initialize(name, comment=nil, location=nil, field_sep='\t', line_sep='\n', &blk)
+    @name, @comment, @location, @field_sep, @line_sep = name, comment, location, field_sep, line_sep
     @columns = []
     @partitions = []
     instance_eval(&blk) if blk
@@ -17,12 +17,12 @@ class TableSchema
   end
   
   def create_table_statement()
-    %[CREATE TABLE #{table_statement}
+    %[CREATE #{external}TABLE #{table_statement}
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '#{@field_sep}'
 LINES TERMINATED BY '#{@line_sep}'
 COLLECTION ITEMS TERMINATED BY '|'
-STORED AS TEXTFILE]
+STORED AS TEXTFILE#{location}]
   end
   
   def replace_columns_statement
@@ -38,10 +38,18 @@ STORED AS TEXTFILE]
   end
   
   private
+
+  def external
+    @location.nil? ? '' : 'EXTERNAL '
+  end
   
   def table_statement
     comment_string = (@comment.nil? ? '' : " COMMENT '#{@comment}'")
     %[`#{@name}` #{column_statement}#{comment_string}\n#{partition_statement}]
+  end
+
+  def location
+    @location.nil? ? '' : "\nLOCATION '#{@location}' "
   end
   
   def alter_columns_statement(add_or_replace)
@@ -54,7 +62,12 @@ STORED AS TEXTFILE]
   end
   
   def partition_statement
+<<<<<<< HEAD
     return '' if @partitions.size == 0
+=======
+    return "" if @partitions.nil? || @partitions.empty?
+    
+>>>>>>> 956b9c968cb980c47a69ef5fcf8aa2b710060ec3
     cols = @partitions.join(",\n")
     "PARTITIONED BY (\n#{cols}\n)"
   end
