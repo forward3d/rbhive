@@ -21,6 +21,7 @@ class TableSchema
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '#{@field_sep}'
 LINES TERMINATED BY '#{@line_sep}'
+COLLECTION ITEMS TERMINATED BY '|'
 STORED AS TEXTFILE]
   end
   
@@ -53,6 +54,7 @@ STORED AS TEXTFILE]
   end
   
   def partition_statement
+    return '' if @partitions.size == 0
     cols = @partitions.join(",\n")
     "PARTITIONED BY (\n#{cols}\n)"
   end

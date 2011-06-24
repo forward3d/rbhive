@@ -100,7 +100,7 @@ module RBHive
     def output(sep, out_file)
       tsv = self.map { |r| r.join("\t") }.join("\n")
       return tsv if out_file.nil?
-      File.open(out_file, 'w') { |f| f << tsv }
+      File.open(out_file, 'w+') { |f| f << tsv }
     end
   end
 end
