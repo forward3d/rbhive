@@ -62,12 +62,7 @@ STORED AS TEXTFILE#{location}]
   end
   
   def partition_statement
-<<<<<<< HEAD
-    return '' if @partitions.size == 0
-=======
     return "" if @partitions.nil? || @partitions.empty?
-    
->>>>>>> 956b9c968cb980c47a69ef5fcf8aa2b710060ec3
     cols = @partitions.join(",\n")
     "PARTITIONED BY (\n#{cols}\n)"
   end
