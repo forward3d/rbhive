@@ -1,8 +1,12 @@
 class TableSchema
   attr_accessor :name
   attr_reader :columns, :partitions
-  def initialize(name, comment=nil, location=nil, field_sep='\t', line_sep='\n', &blk)
-    @name, @comment, @location, @field_sep, @line_sep = name, comment, location, field_sep, line_sep
+  def initialize(name, comment=nil, options={}, &blk)
+    @name, @comment = name, comment
+    @location = options[:location] || nil
+    @field_sep = options[:field_sep] || "\t"
+    @line_sep = options[:line_sep] || "\n"
+    @collection_sep = options[:collection_sep] || "|"
     @columns = []
     @partitions = []
     instance_eval(&blk) if blk
@@ -21,8 +25,9 @@ class TableSchema
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '#{@field_sep}'
 LINES TERMINATED BY '#{@line_sep}'
-COLLECTION ITEMS TERMINATED BY '|'
-STORED AS TEXTFILE#{location}]
+COLLECTION ITEMS TERMINATED BY '#{@collection_sep}'
+STORED AS TEXTFILE
+#{location}]
   end
   
   def replace_columns_statement
@@ -49,7 +54,7 @@ STORED AS TEXTFILE#{location}]
   end
 
   def location
-    @location.nil? ? '' : "\nLOCATION '#{@location}' "
+    @location.nil? ? '' : "LOCATION '#{@location}'"
   end
   
   def alter_columns_statement(add_or_replace)
