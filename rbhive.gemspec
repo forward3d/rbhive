@@ -9,7 +9,9 @@ Gem::Specification.new do |s|
   s.files = [
     "lib/rbhive.rb",
     "lib/rbhive/connection.rb",
-    "lib/rbhive/schema.rb",
+    "lib/rbhive/table_schema.rb",
+    "lib/rbhive/result_set.rb",
+    "lib/rbhive/schema_definition.rb",
     "lib/thrift/facebook_service.rb",
     "lib/thrift/fb303_constants.rb",
     "lib/thrift/fb303_types.rb",
