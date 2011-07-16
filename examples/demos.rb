@@ -1,10 +1,12 @@
 require "rubygems"
 require File.join(File.dirname(__FILE__), *%w[.. lib rbhive])
 
-puts RBHive.connect('hive.hadoop.forward.co.uk') {|db| 
+RBHive.connect('hive.hadoop.forward.co.uk') {|db| 
   db.priority='VERY_LOW'
   
-  p db.fetch %[
-    SELECT * FROM uswitch_ppc_keywords where dated = '2010-11-15' order by keyword LIMIT 10
+  result =  db.fetch %[
+    SELECT * FROM uswitch_ppc_keywords where dated = '2011-07-01' limit 2
   ]
+  
+  puts result.to_tsv.inspect
 }
