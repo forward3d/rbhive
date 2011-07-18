@@ -14,16 +14,16 @@ module RBHive
     end
     
     def to_csv(out_file=nil)
-      output(",", out_file)
+      to_seperated_output(",", out_file)
     end
     
     def to_tsv(out_file=nil)
-      output("\t", out_file)
+      to_seperated_output("\t", out_file)
     end
     
     private
     
-    def output(sep, out_file)
+    def to_seperated_output(sep, out_file)
       rows = self.map { |r| @schema.coerce_row_to_array(r).join(sep) }
       sv = rows.join("\n")
       return sv if out_file.nil?
