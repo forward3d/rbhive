@@ -8,9 +8,9 @@ A simple library to execute Hive queries against the Hive thrift server.
   require 'rbhive'
 
   RBHive.connect('hive.server.address') do |connection|
-    connection.fetch 'SELECT * FROM cities'
+    connection.fetch 'SELECT city, country FROM cities'
   end
-  ➔ [["London", "UK"], ["New York", "USA"], ["Mumbai", "India"]]
+  ➔ [{:city => "London", :country => "UK"}, {:city => "Mumbai", :country => "India"}, {:city => "New York", :country => "USA"}]
 
 == Example to execute a query 
 
