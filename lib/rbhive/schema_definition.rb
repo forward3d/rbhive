@@ -15,7 +15,7 @@ module RBHive
   
     def initialize(schema, example_row)
       @schema = schema
-      @example_row = example_row.split("\t")
+      @example_row = example_row ? example_row.split("\t") : []
     end
   
     def column_names
