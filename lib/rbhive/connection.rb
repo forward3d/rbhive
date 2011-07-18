@@ -73,8 +73,8 @@ module RBHive
       safe do
         execute_unsafe(query)
         rows = client.fetchAll
-        schema = SchemaDefinition.new(client.getSchema, rows.first)
-        ResultSet.new(rows, schema)
+        the_schema = SchemaDefinition.new(client.getSchema, rows.first)
+        ResultSet.new(rows, the_schema)
       end
     end
     
@@ -82,8 +82,8 @@ module RBHive
       safe do
         execute_unsafe(query)
         until (next_batch = client.fetchN(batch_size)).empty?
-          schema ||= SchemaDefinition.new(client.getSchema, next_batch.first)
-          yield ResultSet.new(next_batch, schema)
+          the_schema ||= SchemaDefinition.new(client.getSchema, next_batch.first)
+          yield ResultSet.new(next_batch, the_schema)
         end
       end
     end
@@ -92,9 +92,13 @@ module RBHive
       safe do
         execute_unsafe(query)
         row = client.fetchOne
-        schema = SchemaDefinition.new(client.getSchema, row)
-        ResultSet.new([row], schema).first
+        the_schema = SchemaDefinition.new(client.getSchema, row)
+        ResultSet.new([row], the_schema).first
       end
+    end
+    
+    def schema(example_row=[])
+      safe { SchemaDefinition.new(client.getSchema, example_row) }
     end
     
     def create_table(schema)
