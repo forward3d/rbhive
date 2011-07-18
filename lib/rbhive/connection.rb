@@ -74,7 +74,7 @@ module RBHive
       ResultSet.new(client.fetchAll, client.getSchema)
     end
     
-    def fetch_in_batch(query, batch_size=100)
+    def fetch_in_batch(query, batch_size=1_000)
       execute(query)
       schema = client.getSchema
       until (next_batch = client.fetchN(batch_size)).empty?
