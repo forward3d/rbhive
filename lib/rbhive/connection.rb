@@ -37,6 +37,7 @@ module RBHive
       @client = ThriftHive::Client.new(@protocol)
       @logger = logger
       @logger.info("Connecting to #{server} on port #{port}")
+      @mutex = Mutex.new
     end
     
     def open
@@ -52,8 +53,7 @@ module RBHive
     end
     
     def execute(query)
-      @logger.info("Executing Hive Query: #{query}")
-      client.execute(query)
+      execute_safe(query)
     end
     
     def priority=(priority)
@@ -70,25 +70,31 @@ module RBHive
     end
     
     def fetch(query)
-      execute(query)
-      rows = client.fetchAll
-      schema = SchemaDefinition.new(client.getSchema, rows.first)
-      ResultSet.new(rows, schema)
+      safe do
+        execute_unsafe(query)
+        rows = client.fetchAll
+        schema = SchemaDefinition.new(client.getSchema, rows.first)
+        ResultSet.new(rows, schema)
+      end
     end
     
     def fetch_in_batch(query, batch_size=1_000)
-      execute(query)
-      until (next_batch = client.fetchN(batch_size)).empty?
-        schema ||= SchemaDefinition.new(client.getSchema, next_batch.first)
-        yield ResultSet.new(next_batch, schema)
+      safe do
+        execute_unsafe(query)
+        until (next_batch = client.fetchN(batch_size)).empty?
+          schema ||= SchemaDefinition.new(client.getSchema, next_batch.first)
+          yield ResultSet.new(next_batch, schema)
+        end
       end
     end
     
     def first(query)
-      execute(query)
-      row = client.fetchOne
-      schema = SchemaDefinition.new(client.getSchema, row)
-      ResultSet.new([row], schema).first
+      safe do
+        execute_unsafe(query)
+        row = client.fetchOne
+        schema = SchemaDefinition.new(client.getSchema, row)
+        ResultSet.new([row], schema).first
+      end
     end
     
     def create_table(schema)
@@ -110,6 +116,23 @@ module RBHive
     
     def method_missing(meth, *args)
       client.send(meth, *args)
+    end
+    
+    private
+    
+    def execute_safe(query)
+      safe { execute_unsafe(query) }
+    end
+    
+    def execute_unsafe(query)
+      @logger.info("Executing Hive Query: #{query}")
+      client.execute(query)
+    end
+    
+    def safe
+      ret = nil
+      @mutex.synchronize { ret = yield }
+      ret
     end
   end
 end
