@@ -3,14 +3,14 @@ module RBHive
     attr_reader :schema
   
     TYPES = { 
-      :boolean => :to_s, 
-      :string => :to_s, 
-      :bigint => :to_i, 
-      :float => :to_f, 
-      :double => :to_f, 
-      :int => :to_i, 
-      :smallint => :to_i, 
-      :tinyint => :to_i
+      :boolean  => :to_s,
+      :string   => :to_s,
+      :bigint   => :to_i,
+      :float    => :to_f,
+      :double   => :to_f,
+      :int      => :to_i,
+      :smallint => :to_i,
+      :tinyint  => :to_i,
     }
   
     def initialize(schema, example_row)
