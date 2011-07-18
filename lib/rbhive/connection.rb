@@ -84,7 +84,7 @@ module RBHive
     
     def first(query)
       execute(query)
-      ResultSet.new([client.fetchOne], client.getSchema)
+      ResultSet.new([client.fetchOne], client.getSchema).first
     end
     
     def create_table(schema)
