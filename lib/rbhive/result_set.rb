@@ -1,7 +1,7 @@
 module RBHive
   class ResultSet < Array
-    def initialize(rows, schema=[])
-      @schema = SchemaDefinition.new(schema, rows.first)
+    def initialize(rows, schema)
+      @schema = schema
       super(rows.map {|r| @schema.coerce_row(r) })
     end
     

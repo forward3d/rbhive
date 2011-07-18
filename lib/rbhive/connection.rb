@@ -71,20 +71,24 @@ module RBHive
     
     def fetch(query)
       execute(query)
-      ResultSet.new(client.fetchAll, client.getSchema)
+      rows = client.fetchAll
+      schema = SchemaDefinition.new(client.getSchema, rows.first)
+      ResultSet.new(rows, schema)
     end
     
     def fetch_in_batch(query, batch_size=1_000)
       execute(query)
-      schema = client.getSchema
       until (next_batch = client.fetchN(batch_size)).empty?
+        schema ||= SchemaDefinition.new(client.getSchema, next_batch.first)
         yield ResultSet.new(next_batch, schema)
       end
     end
     
     def first(query)
       execute(query)
-      ResultSet.new([client.fetchOne], client.getSchema).first
+      row = client.fetchOne
+      schema = SchemaDefinition.new(client.getSchema, row)
+      ResultSet.new([row], schema).first
     end
     
     def create_table(schema)

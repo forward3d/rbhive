@@ -8,5 +8,5 @@ RBHive.connect('hive.hadoop.forward.co.uk') {|db|
     SELECT * FROM uswitch_ppc_keywords where dated = '2011-07-01' limit 2
   ]
   
-  puts result.to_tsv.inspect
+  puts result.inspect
 }
