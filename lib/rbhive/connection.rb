@@ -56,6 +56,13 @@ module RBHive
       execute_safe(query)
     end
     
+    def explain(query)
+      safe do
+        execute_unsafe("EXPLAIN "+ query)
+        ExplainResult.new(client.fetchAll)
+      end
+    end
+    
     def priority=(priority)
       set("mapred.job.priority", priority)
     end
