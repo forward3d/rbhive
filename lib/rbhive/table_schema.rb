@@ -25,8 +25,8 @@ module RBHive
       %[CREATE #{external}TABLE #{table_statement}
   ROW FORMAT DELIMITED
   FIELDS TERMINATED BY '#{@field_sep}'
-  LINES TERMINATED BY '#{@line_sep}'
   COLLECTION ITEMS TERMINATED BY '#{@collection_sep}'
+  LINES TERMINATED BY '#{@line_sep}'
   STORED AS TEXTFILE
   #{location}]
     end
