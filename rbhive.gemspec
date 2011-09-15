@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "rbhive"
-  s.version = "0.2.6"
+  s.version = "0.2.7"
   s.authors = ["Forward Internet Group"]
   s.date = %q{2010-12-07}
   s.description = "Simple lib for executing Hive queries"
@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
     "lib/thrift/thrift_hive.rb",
     "lib/thrift/thrift_hive_metastore.rb"
   ]
-  s.homepage = %q{http://github.com/trfficbroker/rbhive}
+  s.homepage = %q{http://github.com/forward/rbhive}
   s.require_paths = ["lib"]
   s.rubygems_version = "1.3.5"
   s.add_dependency('thrift', '>= 0.4.0')
