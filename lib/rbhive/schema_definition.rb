@@ -20,7 +20,19 @@ module RBHive
   
     def column_names
       @column_names ||= begin
-        schema_names = @schema.fieldSchemas.map {|c| c.name.to_sym }
+        schema_names = @schema.fieldSchemas.map {|c| c.name }
+        
+        # In rare cases Hive can return two identical column names
+        # consider SELECT a.foo, b.foo...
+        # in this case you get two columns called foo with no disambiguation.
+        # as a (far from ideal) solution we detect this edge case and rename them
+        # a.foo => foo1, b.foo => foo2
+        # otherwise we will trample one of the columns during Hash mapping.
+        s = Hash.new(0)
+        schema_names.map! { |c| s[c] += 1; s[c] > 1 ? "#{c}---|---#{s[c]}" : c }
+        schema_names.map! { |c| s[c] > 1 ? "#{c}---|---1" : c }
+        schema_names.map! { |c| c.gsub('---|---', '_').to_sym }
+        
         # Lets fix the fact that Hive doesn't return schema data for partitions on SELECT * queries
         # For now we will call them :_p1, :_p2, etc. to avoid collisions.
         offset = 0

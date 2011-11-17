@@ -5,8 +5,9 @@ RBHive.connect('hive.hadoop.forward.co.uk') {|db|
   db.priority='VERY_LOW'
   
   result =  db.fetch %[
-    SELECT * FROM uswitch_ppc_keywords where dated = '2011-07-01' limit 2
+    describe mytable
   ]
   
-  puts result.inspect
+  puts result.column_names.inspect
+  puts result.first.inspect
 }
