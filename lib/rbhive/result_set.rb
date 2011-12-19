@@ -21,6 +21,10 @@ module RBHive
       to_seperated_output("\t", out_file)
     end
     
+    def as_arrays
+      @as_arrays ||= self.map{ |r| @schema.coerce_row_to_array(r) }
+    end
+    
     private
     
     def to_seperated_output(sep, out_file)
