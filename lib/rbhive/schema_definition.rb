@@ -63,6 +63,7 @@ module RBHive
   
     def coerce_column(column_name, value)
       type = column_type_map[column_name]
+      return nil if value.nil? || value == 'NULL' || value == 'null'
       return coerce_complex_value(value) if type.to_s =~ /^array/
       conversion_method = TYPES[type]
       conversion_method ? value.send(conversion_method) : value
