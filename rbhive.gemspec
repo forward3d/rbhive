@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "rbhive"
-  s.version = "0.2.9"
+  s.version = "0.2.92"
   s.authors = ["Forward Internet Group"]
   s.date = %q{2010-12-07}
   s.description = "Simple lib for executing Hive queries"
@@ -33,4 +33,5 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = "1.3.5"
   s.add_dependency('thrift', '>= 0.4.0')
+  s.add_dependency('json')
 end

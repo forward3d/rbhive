@@ -1,3 +1,5 @@
+require 'json'
+
 module RBHive
   class SchemaDefinition
     attr_reader :schema
@@ -61,12 +63,20 @@ module RBHive
   
     def coerce_column(column_name, value)
       type = column_type_map[column_name]
+      return coerce_complex_value(value) if type.to_s =~ /^array/
       conversion_method = TYPES[type]
       conversion_method ? value.send(conversion_method) : value
     end
   
     def coerce_row_to_array(row)
       column_names.map { |n| row[n] }
+    end
+    
+    def coerce_complex_value(value)
+      return nil if value.nil?
+      return nil if value.length == 0
+      return nil if value == 'null'
+      JSON.parse(value)
     end
   end
 end
