@@ -15,12 +15,12 @@ Also supports PLAIN SASL connection to thrift server (HiveServer2)
 
 HiveServer2:
 
-  RBHive.t_c_l_i_connect('hive.server2.address', 'hive.server2.port', 'hive.server2.connection_options_hash') do |connection|
+  RBHive.tcli_connect('hive.server2.address', 'hive.server2.port', 'hive.server2.connection_options_hash') do |connection|
     connection.fetch 'SELECT city, country FROM cities'
   end
   ➔ [{:city => "London", :country => "UK"}, {:city => "Mumbai", :country => "India"}, {:city => "New York", :country => "USA"}]
 
-where connection_options_hash = { username: 'user', password: 'pass'}
+where connection_options_hash = { username: 'user', password: 'pass'} or an empty(nil) is accepted
 It is in progress to implement LDAP/KERBEROS authentication as well. Only NONE supported currently.
 
 == Example to execute a query 
