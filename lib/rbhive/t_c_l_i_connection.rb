@@ -22,7 +22,7 @@ module RBHive
       connection.open_session
       ret = yield(connection)
     ensure
-      connection.close_session if connection.session?
+      connection.close_session if connection.session
       connection.close
       ret
     end
@@ -40,13 +40,18 @@ module RBHive
   class TCLIConnection
     attr_reader :client
 
-    def initialize(server, port=10_000, sasl_params={}, logger=StdOutLogger.new)
+    def initialize(server, port=10_000, sasl_params=nil, logger=StdOutLogger.new)
       @socket = Thrift::Socket.new(server, port)
       @socket.timeout = 1800
       @logger = logger
       if sasl_params.present?
         @logger.info("Initializing transport with SASL support")
         @transport = Thrift::SaslClientTransport.new(@socket, sasl_params)
+        @sasl_params = case sasl_params
+                       when Hash then sasl_params.symbolize_keys
+                       when Hashie::Mash then sasl_params.to_hash(symbolize_keys: true)
+                       else nil
+                       end
       else
         @transport = Thrift::BufferedTransport.new(@socket)
       end
@@ -74,7 +79,7 @@ module RBHive
       @session = nil
     end
 
-    def session?
+    def session
       @session && @session.sessionHandle
     end
 
@@ -134,15 +139,15 @@ module RBHive
     end
 
     def prepare_open_session
-      TOpenSessionReq.new
+      TOpenSessionReq.new( @sasl_params.presence )
     end
 
     def prepare_close_session
-      TCloseSessionReq.new( sessionHandle: @session.sessionHandle )
+      TCloseSessionReq.new( sessionHandle: self.session )
     end
 
     def prepare_execute_statement(query)
-      TExecuteStatementReq.new( sessionHandle: @session.sessionHandle, statement: query.to_s )
+      TExecuteStatementReq.new( sessionHandle: self.session, statement: query.to_s )
     end
 
     def prepare_fetch_results(handle, orientation=:first, rows=100)
