@@ -1,9 +1,11 @@
 = RBHive -- Ruby thrift lib for executing Hive queries
 
 A simple library to execute Hive queries against the Hive thrift server.
-Also supports PLAIN SASL connection to thrift server (HiveServer2)
+Also supports PLAIN SASL connection to HiveServer2 thrift server.
 
-== Example to fetch some results
+== Example of fetching some results
+
+HiveServer:
 
   require 'rubygems'
   require 'rbhive'
@@ -21,9 +23,9 @@ HiveServer2:
   ➔ [{:city => "London", :country => "UK"}, {:city => "Mumbai", :country => "India"}, {:city => "New York", :country => "USA"}]
 
 where connection_options_hash = { username: 'user', password: 'pass'} or an empty(nil) is accepted
-It is in progress to implement LDAP/KERBEROS authentication as well. Only NONE supported currently.
+There are plans to implement LDAP/KERBEROS authentication as well. Only NONE supported currently.
 
-== Example to execute a query 
+== Example of executing a query 
 
   require 'rubygems'
   require 'rbhive'
@@ -33,7 +35,7 @@ It is in progress to implement LDAP/KERBEROS authentication as well. Only NONE s
   end
   ➔ nil
 
-== Example on how to create and/or drop tables
+== Example of how to create and/or drop tables
 
   require 'rubygems'
   require 'rbhive'
@@ -52,7 +54,7 @@ It is in progress to implement LDAP/KERBEROS authentication as well. Only NONE s
     connection.drop_table(table)
   end  
 
-== Example on how to modify table schema
+== Example of how to modify table schema
 
   require 'rubygems'
   require 'rbhive'
