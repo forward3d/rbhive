@@ -139,7 +139,7 @@ module RBHive
     end
 
     def prepare_open_session
-      TOpenSessionReq.new( @sasl_params.presence )
+      TOpenSessionReq.new( @sasl_params.nil? ? [] : @sasl_params )
     end
 
     def prepare_close_session
