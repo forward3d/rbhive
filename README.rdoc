@@ -22,7 +22,8 @@ HiveServer2:
   end
   ➔ [{:city => "London", :country => "UK"}, {:city => "Mumbai", :country => "India"}, {:city => "New York", :country => "USA"}]
 
-where connection_options_hash = { username: 'user', password: 'pass'} or an empty(nil) is accepted
+where connection_options_hash = { username: 'user', password: 'pass'} or an empty(nil) is accepted. 
+
 There are plans to implement LDAP/KERBEROS authentication as well. Only NONE supported currently.
 
 == Example of executing a query 
