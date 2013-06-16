@@ -44,7 +44,7 @@ module RBHive
       @socket = Thrift::Socket.new(server, port)
       @socket.timeout = 1800
       @logger = logger
-      if sasl_params.present?
+      if !sasl_params.nil?
         @logger.info("Initializing transport with SASL support")
         @transport = Thrift::SaslClientTransport.new(@socket, sasl_params)
         @sasl_params = case sasl_params
