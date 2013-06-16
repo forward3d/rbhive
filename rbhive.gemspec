@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
   s.name = "rbhive"
-  s.version = "0.1.01"
+  s.version = "0.3.0"
   s.authors = ["Forward Internet Group","KolobocK"]
   s.date = %q{2013-06-14}
-  s.description = "Simple lib for executing Hive queries (HiveServer2)"
+  s.description = "Simple lib for executing Hive queries"
   s.summary = "Simple lib for executing Hive queries"
   s.email = ["andy@forward.co.uk","kolobock@gmail.com"]
   s.files = [
@@ -36,9 +36,9 @@ Gem::Specification.new do |s|
     "lib/thrift/t_c_l_i_service_types.rb",
     "lib/thrift/sasl_client_transport.rb",
   ]
-  s.homepage = %q{http://github.com/kolobock/rbhive}
+  s.homepage = %q{http://github.com/forward/rbhive}
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.25"
-  s.add_dependency('thrift', '>= 0.9.0')
+  s.rubygems_version = "1.3.5"
+  s.add_dependency('thrift', '>= 0.4.0')
   s.add_dependency('json')
 end
