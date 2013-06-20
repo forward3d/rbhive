@@ -46,12 +46,12 @@ module RBHive
       @logger = logger
       if !sasl_params.nil?
         @logger.info("Initializing transport with SASL support")
-        @transport = Thrift::SaslClientTransport.new(@socket, sasl_params)
         @sasl_params = case sasl_params
-                       when Hash then sasl_params.symbolize_keys
+                       when Hash then sasl_params.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
                        when Hashie::Mash then sasl_params.to_hash(symbolize_keys: true)
                        else nil
                        end
+        @transport = Thrift::SaslClientTransport.new(@socket, @sasl_params)
       else
         @transport = Thrift::BufferedTransport.new(@socket)
       end
