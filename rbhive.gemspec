@@ -25,8 +25,6 @@ Gem::Specification.new do |s|
     "lib/thrift/hive_service_types.rb",
     "lib/thrift/queryplan_constants.rb",
     "lib/thrift/queryplan_types.rb",
-    "lib/thrift/reflection_limited_constants.rb",
-    "lib/thrift/reflection_limited_types.rb",
     "lib/thrift/serde_constants.rb",
     "lib/thrift/serde_types.rb",
     "lib/thrift/thrift_hive.rb",

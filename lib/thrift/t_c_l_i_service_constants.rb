@@ -5,50 +5,54 @@
 #
 
 require 'thrift'
-require File.join(File.dirname(__FILE__), *%w[t_c_l_i_service_types])
+require_relative 't_c_l_i_service_types'
 
-PRIMITIVE_TYPES = Set.new([
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    15,
-])
+module Hive2
+  module Thrift
+    PRIMITIVE_TYPES = Set.new([
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            15,
+    ])
 
-COMPLEX_TYPES = Set.new([
-    10,
-    11,
-    12,
-    13,
-    14,
-])
+    COMPLEX_TYPES = Set.new([
+            10,
+            11,
+            12,
+            13,
+            14,
+    ])
 
-COLLECTION_TYPES = Set.new([
-    10,
-    11,
-])
+    COLLECTION_TYPES = Set.new([
+            10,
+            11,
+    ])
 
-TYPE_NAMES = {
-    0 => %q"BOOLEAN",
-    1 => %q"TINYINT",
-    2 => %q"SMALLINT",
-    3 => %q"INT",
-    4 => %q"BIGINT",
-    5 => %q"FLOAT",
-    6 => %q"DOUBLE",
-    7 => %q"STRING",
-    8 => %q"TIMESTAMP",
-    9 => %q"BINARY",
-    10 => %q"ARRAY",
-    11 => %q"MAP",
-    12 => %q"STRUCT",
-    13 => %q"UNIONTYPE",
-    15 => %q"DECIMAL",
-}
+    TYPE_NAMES = {
+            0 => %q"BOOLEAN",
+            1 => %q"TINYINT",
+            2 => %q"SMALLINT",
+            3 => %q"INT",
+            4 => %q"BIGINT",
+            5 => %q"FLOAT",
+            6 => %q"DOUBLE",
+            7 => %q"STRING",
+            8 => %q"TIMESTAMP",
+            9 => %q"BINARY",
+            10 => %q"ARRAY",
+            11 => %q"MAP",
+            12 => %q"STRUCT",
+            13 => %q"UNIONTYPE",
+            15 => %q"DECIMAL",
+    }
 
+  end
+end

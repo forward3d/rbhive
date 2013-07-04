@@ -56,7 +56,7 @@ module RBHive
         @transport = Thrift::BufferedTransport.new(@socket)
       end
       @protocol = Thrift::BinaryProtocol.new(@transport)
-      @client = TCLIService::Client.new(@protocol)
+      @client = Hive2::Thrift::TCLIService::Client.new(@protocol)
       @session = nil
       @logger.info("Connecting to HiveServer2 #{server} on port #{port}")
       @mutex = Mutex.new
@@ -156,25 +156,25 @@ module RBHive
     end
 
     def prepare_open_session
-      TOpenSessionReq.new( @sasl_params.nil? ? [] : @sasl_params )
+      ::Hive2::Thrift::TOpenSessionReq.new( @sasl_params.nil? ? [] : @sasl_params )
     end
 
     def prepare_close_session
-      TCloseSessionReq.new( sessionHandle: self.session )
+      ::Hive2::Thrift::TCloseSessionReq.new( sessionHandle: self.session )
     end
 
     def prepare_execute_statement(query)
-      TExecuteStatementReq.new( sessionHandle: self.session, statement: query.to_s )
+      ::Hive2::Thrift::TExecuteStatementReq.new( sessionHandle: self.session, statement: query.to_s )
     end
 
     def prepare_fetch_results(handle, orientation=:first, rows=100)
       orientation = orientation.to_s.upcase
-      orientation = 'FIRST' unless TFetchOrientation::VALID_VALUES.include?( "FETCH_#{orientation}" )
-      TFetchResultsReq.new( operationHandle: handle, orientation: eval("TFetchOrientation::FETCH_#{orientation}"), maxRows: rows )
+      orientation = 'FIRST' unless ::Hive2::Thrift::TFetchOrientation::VALID_VALUES.include?( "FETCH_#{orientation}" )
+      ::Hive2::Thrift::TFetchResultsReq.new( operationHandle: handle, orientation: eval("::Hive2::Thrift::TFetchOrientation::FETCH_#{orientation}"), maxRows: rows )
     end
 
     def get_schema_for(handle)
-      req = TGetResultSetMetadataReq.new( operationHandle: handle )
+      req = ::Hive2::Thrift::TGetResultSetMetadataReq.new( operationHandle: handle )
       metadata = client.GetResultSetMetadata( req )
       metadata.schema
     end
