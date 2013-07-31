@@ -21,11 +21,18 @@ module RBHive
       connection.open
       connection.open_session
       ret = yield(connection)
+
     ensure
-      connection.close_session if connection.session
-      connection.close
-      ret
+      # Try to close the session and our connection if those are still open, ignore io errors
+      begin
+        connection.close_session if connection.session
+        connection.close
+      rescue IOError => e
+        # noop
+      end
     end
+
+    return ret
   end
   module_function :tcli_connect
 
@@ -104,15 +111,60 @@ module RBHive
       self.execute("SET #{name}=#{value}")
     end
 
-    def fetch(query)
+    # Performs a query on the server, fetches up to *max_rows* rows and returns them as an array.
+    def fetch(query, max_rows = 100)
       safe do
-        op_handle = execute_unsafe(query).operationHandle
-        fetch_req = prepare_fetch_results(op_handle)
+        # Execute the query and check the result
+        exec_result = execute_unsafe(query)
+        raise_error_if_failed!(exec_result)
+
+        # Get search operation handle to fetch the results
+        op_handle = exec_result.operationHandle
+
+        # Prepare and execute fetch results request
+        fetch_req = prepare_fetch_results(op_handle, :first, max_rows)
         fetch_results = client.FetchResults(fetch_req)
-        raise fetch_results.status.try(:errorMessage, 'Execution failed!').to_s if fetch_results.status.statusCode != 0
+        raise_error_if_failed!(fetch_results)
+
+        # Get data rows and format the result
         rows = fetch_results.results.rows
         the_schema = TCLISchemaDefinition.new(get_schema_for( op_handle ), rows.first)
         TCLIResultSet.new(rows, the_schema)
+      end
+    end
+
+    # Performs a query on the server, fetches the results in batches of *batch_size* rows
+    # and yields the result batches to a given block as arrays of rows.
+    def fetch_in_batch(query, batch_size = 1000, &block)
+      raise "No block given for the batch fetch request!" unless block_given?
+      safe do
+        # Execute the query and check the result
+        exec_result = execute_unsafe(query)
+        raise_error_if_failed!(exec_result)
+
+        # Get search operation handle to fetch the results
+        op_handle = exec_result.operationHandle
+
+        # Prepare fetch results request
+        fetch_req = prepare_fetch_results(op_handle, :next, batch_size)
+
+        # Now let's iterate over the results
+        loop do
+          # Fetch next batch and raise an exception if it failed
+          fetch_results = client.FetchResults(fetch_req)
+          raise_error_if_failed!(fetch_results)
+
+          # Get data rows from the result
+          rows = fetch_results.results.rows
+          break if rows.empty?
+
+          # Prepare schema definition for the row
+          schema_for_req ||= get_schema_for(op_handle)
+          the_schema ||= TCLISchemaDefinition.new(schema_for_req, rows.first)
+
+          # Format the results and yield them to the given block
+          yield TCLIResultSet.new(rows, the_schema)
+        end
       end
     end
 
@@ -168,15 +220,30 @@ module RBHive
     end
 
     def prepare_fetch_results(handle, orientation=:first, rows=100)
-      orientation = orientation.to_s.upcase
-      orientation = 'FIRST' unless ::Hive2::Thrift::TFetchOrientation::VALID_VALUES.include?( "FETCH_#{orientation}" )
-      ::Hive2::Thrift::TFetchResultsReq.new( operationHandle: handle, orientation: eval("::Hive2::Thrift::TFetchOrientation::FETCH_#{orientation}"), maxRows: rows )
+      orientation_value = "FETCH_#{orientation.to_s.upcase}"
+      valid_orientations = ::Hive2::Thrift::TFetchOrientation::VALUE_MAP.values
+      unless valid_orientations.include?(orientation_value)
+        raise ArgumentError, "Invalid orientation: #{orientation.inspect}"
+      end
+      orientation_const = eval("::Hive2::Thrift::TFetchOrientation::#{orientation_value}")
+      ::Hive2::Thrift::TFetchResultsReq.new(
+        operationHandle: handle,
+        orientation: orientation_const,
+        maxRows: rows
+      )
     end
 
     def get_schema_for(handle)
       req = ::Hive2::Thrift::TGetResultSetMetadataReq.new( operationHandle: handle )
       metadata = client.GetResultSetMetadata( req )
       metadata.schema
+    end
+
+    # Raises an exception if given operation result is a failure
+    def raise_error_if_failed!(result)
+      return if result.status.statusCode == 0
+      error_message = result.status.errorMessage || 'Execution failed!'
+      raise error_message
     end
   end
 end
