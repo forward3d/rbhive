@@ -119,16 +119,16 @@ module RBHive
     def create_table(schema)
       execute(schema.create_table_statement)
     end
-    
+
     def drop_table(name)
       name = name.name if name.is_a?(TableSchema)
       execute("DROP TABLE `#{name}`")
     end
-    
+
     def replace_columns(schema)
       execute(schema.replace_columns_statement)
     end
-    
+
     def add_columns(schema)
       execute(schema.add_columns_statement)
     end
@@ -164,7 +164,7 @@ module RBHive
     end
 
     def prepare_execute_statement(query)
-      ::Hive2::Thrift::TExecuteStatementReq.new( sessionHandle: self.session, statement: query.to_s )
+      ::Hive2::Thrift::TExecuteStatementReq.new( sessionHandle: self.session, statement: query.to_s, confOverlay: {} )
     end
 
     def prepare_fetch_results(handle, orientation=:first, rows=100)
