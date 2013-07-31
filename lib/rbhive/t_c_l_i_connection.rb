@@ -111,6 +111,7 @@ module RBHive
       self.execute("SET #{name}=#{value}")
     end
 
+    # Performs a query on the server, fetches up to *max_rows* rows and returns them as an array.
     def fetch(query, max_rows = 100)
       safe do
         # Execute the query and check the result
@@ -132,6 +133,8 @@ module RBHive
       end
     end
 
+    # Performs a query on the server, fetches the results in batches of *batch_size* rows
+    # and yields the result batches to a given block as arrays of rows.
     def fetch_in_batch(query, batch_size = 1000, &block)
       raise "No block given for the batch fetch request!" unless block_given?
       safe do
