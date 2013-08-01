@@ -51,22 +51,32 @@ module RBHive
       @socket = Thrift::Socket.new(server, port)
       @socket.timeout = 1800
       @logger = logger
-      if !sasl_params.nil?
+
+      @sasl_params = parse_sasl_params(sasl_params)
+      if @sasl_params
         @logger.info("Initializing transport with SASL support")
-        @sasl_params = case sasl_params
-                       when Hash then sasl_params.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
-                       when Hashie::Mash then sasl_params.to_hash(symbolize_keys: true)
-                       else nil
-                       end
         @transport = Thrift::SaslClientTransport.new(@socket, @sasl_params)
       else
         @transport = Thrift::BufferedTransport.new(@socket)
       end
+
       @protocol = Thrift::BinaryProtocol.new(@transport)
       @client = Hive2::Thrift::TCLIService::Client.new(@protocol)
       @session = nil
       @logger.info("Connecting to HiveServer2 #{server} on port #{port}")
       @mutex = Mutex.new
+    end
+
+    # Processes SASL connection params and returns a hash with symbol keys or a nil
+    def parse_sasl_params(sasl_params)
+      # Symbilize keys in a hash
+      if sasl_params.kind_of?(Hash)
+        return sasl_params.inject({}) do |memo,(k,v)|
+          memo[k.to_sym] = v;
+          memo
+        end
+      end
+      return nil
     end
 
     def open
