@@ -81,6 +81,9 @@ module Thrift
     def reset_buffer!
       len, = @transport.read(PAYLOAD_LENGTH_BYTES).unpack('l>')
       @rbuf = @transport.read(len)
+      while @rbuf.size < len
+        @rbuf << @transport.read(len - @rbuf.size)
+      end
       @index = 0
     end
   end
