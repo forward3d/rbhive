@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/forward/rbhive}
   s.require_paths = ["lib"]
   s.rubygems_version = "1.3.5"
-  s.add_dependency('thrift', '>= 0.4.0')
+  s.add_dependency('thrift', '>= 0.9.0')
+  s.add_dependency('thin', '~> 1.6.0')
   s.add_dependency('json')
 end
