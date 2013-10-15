@@ -1,11 +1,11 @@
 Gem::Specification.new do |s|
   s.name = "rbhive"
   s.version = "0.4.0"
-  s.authors = ["Forward Internet Group","KolobocK"]
+  s.authors = ["Forward3D","KolobocK"]
   s.date = %q{2013-06-14}
   s.description = "Simple lib for executing Hive queries"
   s.summary = "Simple lib for executing Hive queries"
-  s.email = ["andy@forward.co.uk","kolobock@gmail.com"]
+  s.email = ["andy@forward.co.uk","kolobock@gmail.com", "developers@forward3d.com"]
   s.files = [
     "lib/rbhive.rb",
     "lib/rbhive/connection.rb",
@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
     "lib/thrift/t_c_l_i_service_types.rb",
     "lib/thrift/sasl_client_transport.rb",
   ]
-  s.homepage = %q{http://github.com/forward/rbhive}
+  s.homepage = %q{http://github.com/forward3d/rbhive}
   s.require_paths = ["lib"]
   s.rubygems_version = "1.3.5"
   s.add_dependency('thrift', '>= 0.9.0')
