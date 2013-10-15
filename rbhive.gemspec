@@ -38,6 +38,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = "1.3.5"
   s.add_dependency('thrift', '>= 0.9.0')
-  s.add_dependency('thin', '~> 1.6.0')
+  s.add_dependency('thin', '~> 1.5.1')
   s.add_dependency('json')
 end
