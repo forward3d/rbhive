@@ -10,7 +10,7 @@ hive_server = ENV['HIVE_SERVER'] || 'localhost'
 hive_port = (ENV['HIVE_PORT'] || 10_000).to_i
 
 puts "Connecting to #{hive_server}:#{hive_port} using SASL..."
-RBHive.tcli_connect(hive_server, hive_port, nil) do |conn|
+RBHive.tcli_connect(hive_server, :buffered, hive_port, nil) do |conn|
   puts "Fetching tables list..."
   tables = conn.fetch("SHOW TABLES")
   table_names = tables.map { |t| t[:tab_name] }
