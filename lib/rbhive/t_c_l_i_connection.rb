@@ -12,10 +12,26 @@ require File.join(File.dirname(__FILE__), *%w[.. thrift sasl_client_transport])
 # restore warnings
 $VERBOSE = old_verbose
 
+# Monkey patch thrift to set an infinite read timeout
+module Thrift
+  class HTTPClientTransport < BaseTransport
+    def flush
+      http = Net::HTTP.new @url.host, @url.port
+      http.use_ssl = @url.scheme == 'https'
+      http.read_timeout = nil
+      http.verify_mode = @ssl_verify_mode if @url.scheme == 'https'
+      resp = http.post(@url.request_uri, @outbuf, @headers)
+      data = resp.body
+      data = Bytes.force_binary_encoding(data)
+      @inbuf = StringIO.new data
+      @outbuf = Bytes.empty_byte_buffer
+    end
+  end
+end
 
 module RBHive
-  def tcli_connect(server, port=10_000, sasl_params={})
-    connection = RBHive::TCLIConnection.new(server, port, sasl_params)
+  def tcli_connect(server, port=10_000, transport=:buffered, sasl_params={})
+    connection = RBHive::TCLIConnection.new(server, port, transport, sasl_params)
     ret = nil
     begin
       connection.open
@@ -47,7 +63,7 @@ module RBHive
   class TCLIConnection
     attr_reader :client
 
-    def initialize(server, port=10_000, sasl_params=nil, logger=StdOutLogger.new)
+    def initialize(server, port=10_000, transport=:buffered, sasl_params=nil, logger=StdOutLogger.new)
       @socket = Thrift::Socket.new(server, port)
       @socket.timeout = 1800
       @logger = logger
@@ -56,8 +72,14 @@ module RBHive
       if @sasl_params
         @logger.info("Initializing transport with SASL support")
         @transport = Thrift::SaslClientTransport.new(@socket, @sasl_params)
-      else
+      elsif transport == :buffered
+        @logger.info("Initializing transport as BufferedTransport")
         @transport = Thrift::BufferedTransport.new(@socket)
+      elsif transport == :http
+        @logger.info("Initializing transport as HTTPClientTransport")
+        @transport = Thrift::HTTPClientTransport.new("http://#{server}:#{port}/cliservice")
+      else
+        raise "Unrecognised transport type '#{transport}'"
       end
 
       @protocol = Thrift::BinaryProtocol.new(@transport)
@@ -218,7 +240,8 @@ module RBHive
     end
 
     def prepare_open_session
-      ::Hive2::Thrift::TOpenSessionReq.new( @sasl_params.nil? ? [] : @sasl_params )
+      #::Hive2::Thrift::TOpenSessionReq.new( @sasl_params.nil? ? [] : @sasl_params )
+      ::Hive2::Thrift::TOpenSessionReq.new()
     end
 
     def prepare_close_session
