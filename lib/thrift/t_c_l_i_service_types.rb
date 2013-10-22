@@ -10,8 +10,10 @@ module Hive2
   module Thrift
     module TProtocolVersion
       HIVE_CLI_SERVICE_PROTOCOL_V1 = 0
-      VALUE_MAP = {0 => "HIVE_CLI_SERVICE_PROTOCOL_V1"}
-      VALID_VALUES = Set.new([HIVE_CLI_SERVICE_PROTOCOL_V1]).freeze
+      HIVE_CLI_SERVICE_PROTOCOL_V2 = 1
+      HIVE_CLI_SERVICE_PROTOCOL_V3 = 2
+      VALUE_MAP = {0 => "HIVE_CLI_SERVICE_PROTOCOL_V1", 1 => "HIVE_CLI_SERVICE_PROTOCOL_V2", 2 => "HIVE_CLI_SERVICE_PROTOCOL_V3"}
+      VALID_VALUES = Set.new([HIVE_CLI_SERVICE_PROTOCOL_V1, HIVE_CLI_SERVICE_PROTOCOL_V2, HIVE_CLI_SERVICE_PROTOCOL_V3]).freeze
     end
 
     module TTypeId
@@ -31,8 +33,11 @@ module Hive2
       UNION_TYPE = 13
       USER_DEFINED_TYPE = 14
       DECIMAL_TYPE = 15
-      VALUE_MAP = {0 => "BOOLEAN_TYPE", 1 => "TINYINT_TYPE", 2 => "SMALLINT_TYPE", 3 => "INT_TYPE", 4 => "BIGINT_TYPE", 5 => "FLOAT_TYPE", 6 => "DOUBLE_TYPE", 7 => "STRING_TYPE", 8 => "TIMESTAMP_TYPE", 9 => "BINARY_TYPE", 10 => "ARRAY_TYPE", 11 => "MAP_TYPE", 12 => "STRUCT_TYPE", 13 => "UNION_TYPE", 14 => "USER_DEFINED_TYPE", 15 => "DECIMAL_TYPE"}
-      VALID_VALUES = Set.new([BOOLEAN_TYPE, TINYINT_TYPE, SMALLINT_TYPE, INT_TYPE, BIGINT_TYPE, FLOAT_TYPE, DOUBLE_TYPE, STRING_TYPE, TIMESTAMP_TYPE, BINARY_TYPE, ARRAY_TYPE, MAP_TYPE, STRUCT_TYPE, UNION_TYPE, USER_DEFINED_TYPE, DECIMAL_TYPE]).freeze
+      NULL_TYPE = 16
+      DATE_TYPE = 17
+      VARCHAR_TYPE = 18
+      VALUE_MAP = {0 => "BOOLEAN_TYPE", 1 => "TINYINT_TYPE", 2 => "SMALLINT_TYPE", 3 => "INT_TYPE", 4 => "BIGINT_TYPE", 5 => "FLOAT_TYPE", 6 => "DOUBLE_TYPE", 7 => "STRING_TYPE", 8 => "TIMESTAMP_TYPE", 9 => "BINARY_TYPE", 10 => "ARRAY_TYPE", 11 => "MAP_TYPE", 12 => "STRUCT_TYPE", 13 => "UNION_TYPE", 14 => "USER_DEFINED_TYPE", 15 => "DECIMAL_TYPE", 16 => "NULL_TYPE", 17 => "DATE_TYPE", 18 => "VARCHAR_TYPE"}
+      VALID_VALUES = Set.new([BOOLEAN_TYPE, TINYINT_TYPE, SMALLINT_TYPE, INT_TYPE, BIGINT_TYPE, FLOAT_TYPE, DOUBLE_TYPE, STRING_TYPE, TIMESTAMP_TYPE, BINARY_TYPE, ARRAY_TYPE, MAP_TYPE, STRUCT_TYPE, UNION_TYPE, USER_DEFINED_TYPE, DECIMAL_TYPE, NULL_TYPE, DATE_TYPE, VARCHAR_TYPE]).freeze
     end
 
     module TStatusCode
@@ -53,8 +58,9 @@ module Hive2
       CLOSED_STATE = 4
       ERROR_STATE = 5
       UKNOWN_STATE = 6
-      VALUE_MAP = {0 => "INITIALIZED_STATE", 1 => "RUNNING_STATE", 2 => "FINISHED_STATE", 3 => "CANCELED_STATE", 4 => "CLOSED_STATE", 5 => "ERROR_STATE", 6 => "UKNOWN_STATE"}
-      VALID_VALUES = Set.new([INITIALIZED_STATE, RUNNING_STATE, FINISHED_STATE, CANCELED_STATE, CLOSED_STATE, ERROR_STATE, UKNOWN_STATE]).freeze
+      PENDING_STATE = 7
+      VALUE_MAP = {0 => "INITIALIZED_STATE", 1 => "RUNNING_STATE", 2 => "FINISHED_STATE", 3 => "CANCELED_STATE", 4 => "CLOSED_STATE", 5 => "ERROR_STATE", 6 => "UKNOWN_STATE", 7 => "PENDING_STATE"}
+      VALID_VALUES = Set.new([INITIALIZED_STATE, RUNNING_STATE, FINISHED_STATE, CANCELED_STATE, CLOSED_STATE, ERROR_STATE, UKNOWN_STATE, PENDING_STATE]).freeze
     end
 
     module TOperationType
@@ -134,12 +140,60 @@ module Hive2
       VALID_VALUES = Set.new([FETCH_NEXT, FETCH_PRIOR, FETCH_RELATIVE, FETCH_ABSOLUTE, FETCH_FIRST, FETCH_LAST]).freeze
     end
 
+    class TTypeQualifierValue < ::Thrift::Union
+      include ::Thrift::Struct_Union
+      class << self
+        def i32Value(val)
+          TTypeQualifierValue.new(:i32Value, val)
+        end
+
+        def stringValue(val)
+          TTypeQualifierValue.new(:stringValue, val)
+        end
+      end
+
+      I32VALUE = 1
+      STRINGVALUE = 2
+
+      FIELDS = {
+        I32VALUE => {:type => ::Thrift::Types::I32, :name => 'i32Value', :optional => true},
+        STRINGVALUE => {:type => ::Thrift::Types::STRING, :name => 'stringValue', :optional => true}
+      }
+
+      def struct_fields; FIELDS; end
+
+      def validate
+        raise(StandardError, 'Union fields are not set.') if get_set_field.nil? || get_value.nil?
+      end
+
+      ::Thrift::Union.generate_accessors self
+    end
+
+    class TTypeQualifiers
+      include ::Thrift::Struct, ::Thrift::Struct_Union
+      QUALIFIERS = 1
+
+      FIELDS = {
+        QUALIFIERS => {:type => ::Thrift::Types::MAP, :name => 'qualifiers', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRUCT, :class => ::Hive2::Thrift::TTypeQualifierValue}}
+      }
+
+      def struct_fields; FIELDS; end
+
+      def validate
+        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field qualifiers is unset!') unless @qualifiers
+      end
+
+      ::Thrift::Struct.generate_accessors self
+    end
+
     class TPrimitiveTypeEntry
       include ::Thrift::Struct, ::Thrift::Struct_Union
       TYPE = 1
+      TYPEQUALIFIERS = 2
 
       FIELDS = {
-        TYPE => {:type => ::Thrift::Types::I32, :name => 'type', :enum_class => ::Hive2::Thrift::TTypeId}
+        TYPE => {:type => ::Thrift::Types::I32, :name => 'type', :enum_class => ::Hive2::Thrift::TTypeId},
+        TYPEQUALIFIERS => {:type => ::Thrift::Types::STRUCT, :name => 'typeQualifiers', :class => ::Hive2::Thrift::TTypeQualifiers, :optional => true}
       }
 
       def struct_fields; FIELDS; end
@@ -724,7 +778,7 @@ module Hive2
       CONFIGURATION = 4
 
       FIELDS = {
-        CLIENT_PROTOCOL => {:type => ::Thrift::Types::I32, :name => 'client_protocol', :default =>         0, :enum_class => ::Hive2::Thrift::TProtocolVersion},
+        CLIENT_PROTOCOL => {:type => ::Thrift::Types::I32, :name => 'client_protocol', :default =>         2, :enum_class => ::Hive2::Thrift::TProtocolVersion},
         USERNAME => {:type => ::Thrift::Types::STRING, :name => 'username', :optional => true},
         PASSWORD => {:type => ::Thrift::Types::STRING, :name => 'password', :optional => true},
         CONFIGURATION => {:type => ::Thrift::Types::MAP, :name => 'configuration', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}, :optional => true}
@@ -751,7 +805,7 @@ module Hive2
 
       FIELDS = {
         STATUS => {:type => ::Thrift::Types::STRUCT, :name => 'status', :class => ::Hive2::Thrift::TStatus},
-        SERVERPROTOCOLVERSION => {:type => ::Thrift::Types::I32, :name => 'serverProtocolVersion', :default =>         0, :enum_class => ::Hive2::Thrift::TProtocolVersion},
+        SERVERPROTOCOLVERSION => {:type => ::Thrift::Types::I32, :name => 'serverProtocolVersion', :default =>         2, :enum_class => ::Hive2::Thrift::TProtocolVersion},
         SESSIONHANDLE => {:type => ::Thrift::Types::STRUCT, :name => 'sessionHandle', :class => ::Hive2::Thrift::TSessionHandle, :optional => true},
         CONFIGURATION => {:type => ::Thrift::Types::MAP, :name => 'configuration', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}, :optional => true}
       }
@@ -904,11 +958,13 @@ module Hive2
       SESSIONHANDLE = 1
       STATEMENT = 2
       CONFOVERLAY = 3
+      RUNASYNC = 4
 
       FIELDS = {
         SESSIONHANDLE => {:type => ::Thrift::Types::STRUCT, :name => 'sessionHandle', :class => ::Hive2::Thrift::TSessionHandle},
         STATEMENT => {:type => ::Thrift::Types::STRING, :name => 'statement'},
-        CONFOVERLAY => {:type => ::Thrift::Types::MAP, :name => 'confOverlay', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}, :optional => true}
+        CONFOVERLAY => {:type => ::Thrift::Types::MAP, :name => 'confOverlay', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}, :optional => true},
+        RUNASYNC => {:type => ::Thrift::Types::BOOL, :name => 'runAsync', :default => false, :optional => true}
       }
 
       def struct_fields; FIELDS; end
@@ -1404,43 +1460,6 @@ module Hive2
 
       def validate
         raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field status is unset!') unless @status
-      end
-
-      ::Thrift::Struct.generate_accessors self
-    end
-
-    class TGetLogReq
-      include ::Thrift::Struct, ::Thrift::Struct_Union
-      OPERATIONHANDLE = 1
-
-      FIELDS = {
-        OPERATIONHANDLE => {:type => ::Thrift::Types::STRUCT, :name => 'operationHandle', :class => ::Hive2::Thrift::TOperationHandle}
-      }
-
-      def struct_fields; FIELDS; end
-
-      def validate
-        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field operationHandle is unset!') unless @operationHandle
-      end
-
-      ::Thrift::Struct.generate_accessors self
-    end
-
-    class TGetLogResp
-      include ::Thrift::Struct, ::Thrift::Struct_Union
-      STATUS = 1
-      LOG = 2
-
-      FIELDS = {
-        STATUS => {:type => ::Thrift::Types::STRUCT, :name => 'status', :class => ::Hive2::Thrift::TStatus},
-        LOG => {:type => ::Thrift::Types::STRING, :name => 'log'}
-      }
-
-      def struct_fields; FIELDS; end
-
-      def validate
-        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field status is unset!') unless @status
-        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field log is unset!') unless @log
       end
 
       ::Thrift::Struct.generate_accessors self
