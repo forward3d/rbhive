@@ -31,6 +31,8 @@ supported; starting with Hive 0.12, HTTPClientTransport is also supported.
 Each of the versions after Hive 0.10 has a slightly different Thrift interface; when
 connecting, you must specify the Hive version or you may get an exception.
 
+RBHive implements this client with the `RBHive::TCLIConnection` class.
+
 ### Other Hive-compatible services
 
 Consult the documentation for the service, as this will vary depending on the service you're using.
