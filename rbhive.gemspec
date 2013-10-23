@@ -11,6 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = "Simple gem for executing Hive queries"
   spec.email = ["andy@forward.co.uk","kolobock@gmail.com", "developers@forward3d.com"]
   spec.homepage = %q{http://github.com/forward3d/rbhive}
+  spec.license = "MIT"
   
   spec.files = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
