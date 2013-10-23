@@ -30,8 +30,15 @@ module Thrift
 end
 
 module RBHive
-  def tcli_connect(server, port=10_000, transport=:buffered, sasl_params={})
-    connection = RBHive::TCLIConnection.new(server, port, transport, sasl_params)
+  
+  HIVE_THRIFT_MAPPING = {
+    10 => 0,
+    11 => 1,
+    12 => 2
+  }
+  
+  def tcli_connect(server, port=10_000, options)
+    connection = RBHive::TCLIConnection.new(server, port, options)
     ret = nil
     begin
       connection.open
@@ -63,30 +70,58 @@ module RBHive
   class TCLIConnection
     attr_reader :client
 
-    def initialize(server, port=10_000, transport=:buffered, sasl_params=nil, logger=StdOutLogger.new)
-      @socket = Thrift::Socket.new(server, port)
-      @socket.timeout = 1800
-      @logger = logger
-
-      @sasl_params = parse_sasl_params(sasl_params)
-      if @sasl_params
-        @logger.info("Initializing transport with SASL support")
-        @transport = Thrift::SaslClientTransport.new(@socket, @sasl_params)
-      elsif transport == :buffered
-        @logger.info("Initializing transport as BufferedTransport")
-        @transport = Thrift::BufferedTransport.new(@socket)
-      elsif transport == :http
-        @logger.info("Initializing transport as HTTPClientTransport")
-        @transport = Thrift::HTTPClientTransport.new("http://#{server}:#{port}/cliservice")
-      else
-        raise "Unrecognised transport type '#{transport}'"
+    def initialize(server, port=10_000, options={}, logger=StdOutLogger.new)
+      options ||= {} # backwards compatibility
+      raise "'options' parameter must be a hash" unless options.is_a?(Hash)
+      
+      if options[:transport] == :sasl and options[:sasl_params].nil?
+        raise ":transport is set to :sasl, but no :sasl_params option was supplied"
       end
-
+      
+      # Defaults to buffered transport, Hive 0.10, 1800 second timeout
+      options[:transport]     ||= :buffered
+      options[:hive_version]  ||= 10
+      options[:timeout]       ||= 1800
+      @options = options
+      
+      # Look up the appropriate Thrift protocol version for the supplied Hive version
+      @thrift_protocol_version = thrift_hive_protocol(options[:hive_version])
+      
+      @logger = logger
+      @transport = thrift_transport(server, port)
       @protocol = Thrift::BinaryProtocol.new(@transport)
       @client = Hive2::Thrift::TCLIService::Client.new(@protocol)
       @session = nil
       @logger.info("Connecting to HiveServer2 #{server} on port #{port}")
       @mutex = Mutex.new
+    end
+    
+    def thrift_hive_protocol(version)
+      raise "Invalid Hive version" unless HIVE_THRIFT_MAPPING.keys.include?(version)
+      HIVE_THRIFT_MAPPING[version]
+    end
+    
+    def thrift_transport(server, port)
+      case @options[:transport]
+      when :buffered
+        @logger.info("Initializing transport as BufferedTransport")
+        return Thrift::BufferedTransport.new(thrift_socket(server, port, @options[:timeout]))
+      when :sasl
+        @logger.info("Initializing transport with SASL support")
+        return Thrift::SaslClientTransport.new(
+          thrift_socket(server, port, @options[:timeout]), parse_sasl_params(@options[:sasl_params]))
+      when :http
+        @logger.info("Initializing transport as HTTPClientTransport")
+        return Thrift::HTTPClientTransport.new("http://#{server}:#{port}/cliservice")
+      else
+        raise "Unrecognised transport type '#{transport}'"
+      end
+    end
+
+    def thrift_socket(server, port, timeout)
+      socket = Thrift::Socket.new(server, port)
+      socket.timeout = timeout
+      socket
     end
 
     # Processes SASL connection params and returns a hash with symbol keys or a nil
@@ -110,7 +145,7 @@ module RBHive
     end
 
     def open_session
-      @session = @client.OpenSession(prepare_open_session)
+      @session = @client.OpenSession(prepare_open_session(@thrift_protocol_version))
     end
 
     def close_session
@@ -239,9 +274,10 @@ module RBHive
       ret
     end
 
-    def prepare_open_session
-      #::Hive2::Thrift::TOpenSessionReq.new( @sasl_params.nil? ? [] : @sasl_params )
-      ::Hive2::Thrift::TOpenSessionReq.new()
+    def prepare_open_session(client_protocol)
+      req = ::Hive2::Thrift::TOpenSessionReq.new( @options[:sasl_params].nil? ? [] : @options[:sasl_params] )
+      req.client_protocol = client_protocol
+      req
     end
 
     def prepare_close_session
