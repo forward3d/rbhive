@@ -97,21 +97,18 @@ module RBHive
     end
     
     def thrift_hive_protocol(version)
-      raise "Invalid Hive version" unless HIVE_THRIFT_MAPPING.keys.include?(version)
-      HIVE_THRIFT_MAPPING[version]
+      HIVE_THRIFT_MAPPING[version] || raise("Invalid Hive version")
     end
     
     def thrift_transport(server, port)
+      @logger.info("Initializing transport #{@options[:transport]}")
       case @options[:transport]
       when :buffered
-        @logger.info("Initializing transport as BufferedTransport")
         return Thrift::BufferedTransport.new(thrift_socket(server, port, @options[:timeout]))
       when :sasl
-        @logger.info("Initializing transport with SASL support")
-        return Thrift::SaslClientTransport.new(
-          thrift_socket(server, port, @options[:timeout]), parse_sasl_params(@options[:sasl_params]))
+        return Thrift::SaslClientTransport.new(thrift_socket(server, port, @options[:timeout]),
+                                               parse_sasl_params(@options[:sasl_params]))
       when :http
-        @logger.info("Initializing transport as HTTPClientTransport")
         return Thrift::HTTPClientTransport.new("http://#{server}:#{port}/cliservice")
       else
         raise "Unrecognised transport type '#{transport}'"
