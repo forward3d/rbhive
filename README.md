@@ -161,6 +161,32 @@ Or Hiveserver2:
       connection.replace_columns(table)
     end  
 
+### Setting properties
+
+You can set various properties for Hive tasks, some of which change how they run. Consult the Apache
+Hive documentation and Hadoop's documentation for the various properties that can be set. 
+For example, you can set the map-reduce job's priority with the following:
+
+    connection.set("mapred.job.priority", "VERY_HIGH")
+
+### Inspecting tables
+
+#### Hiveserver
+
+    RBHive.connect('hive.hadoop.forward.co.uk', 10_000) {|connection| 
+      result = connection.fetch("describe some_table")
+      puts result.column_names.inspect
+      puts result.first.inspect
+    }
+
+#### Hiveserver2
+
+    RBHive.tcli_connect('hive.hadoop.forward.co.uk', 10_000) {|connection| 
+      result = connection.fetch("describe some_table")
+      puts result.column_names.inspect
+      puts result.first.inspect
+    }
+
 ## Testing
 
 We use RBHive against Hive 0.10, 0.11 and 0.12, and have tested the BufferedTransport and
