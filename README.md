@@ -33,6 +33,26 @@ connecting, you must specify the Hive version or you may get an exception.
 
 RBHive implements this client with the `RBHive::TCLIConnection` class.
 
+#### Warning!
+
+We had to set the following in hive-site.xml to get the BufferedTransport Thrift service
+to work with RBHive:
+
+    <property>
+      <name>hive.server2.enable.doAs</name>
+      <value>false</value>
+    </property>
+
+Otherwise you'll get this nasty-looking exception in the logs:
+
+    ERROR server.TThreadPoolServer: Error occurred during processing of message.
+    java.lang.ClassCastException: org.apache.thrift.transport.TSocket cannot be cast to org.apache.thrift.transport.TSaslServerTransport
+      at org.apache.hive.service.auth.TUGIContainingProcessor.process(TUGIContainingProcessor.java:35)
+      at org.apache.thrift.server.TThreadPoolServer$WorkerProcess.run(TThreadPoolServer.java:206)
+      at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+      at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+      at java.lang.Thread.run(Thread.java:662) 
+
 ### Other Hive-compatible services
 
 Consult the documentation for the service, as this will vary depending on the service you're using.
