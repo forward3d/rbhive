@@ -174,6 +174,16 @@ module RBHive
       @logger.info("Setting #{name}=#{value}")
       self.execute("SET #{name}=#{value}")
     end
+    
+    # Performs a explain on the supplied query on the server, returns it as a ExplainResult.
+    # (Only works on 0.12 if you have this patch - https://issues.apache.org/jira/browse/HIVE-5492)
+    def explain(query)
+      rows = []
+      fetch_in_batch("EXPLAIN " + query) do |batch|
+        rows << batch.map { |b| b[:Explain] }
+      end
+      ExplainResult.new(rows.flatten)
+    end
 
     # Performs a query on the server, fetches up to *max_rows* rows and returns them as an array.
     def fetch(query, max_rows = 100)
