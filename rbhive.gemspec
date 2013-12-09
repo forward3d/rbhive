@@ -18,7 +18,6 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
   
-  spec.add_dependency('thrift', '>= 0.9.0')
-  spec.add_dependency('thin', '~> 1.5.1')
+  spec.add_dependency('thrift', '= 0.9.0')
   spec.add_dependency('json')
 end
