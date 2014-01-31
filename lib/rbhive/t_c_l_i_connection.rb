@@ -266,7 +266,11 @@ module RBHive
     private
 
     def execute_safe(query)
-      safe { execute_unsafe(query) }
+      safe do
+        exec_result = execute_unsafe(query)
+        raise_error_if_failed!(exec_result)
+        exec_result
+      end
     end
 
     def execute_unsafe(query)
