@@ -34,7 +34,17 @@ module RBHive
   HIVE_THRIFT_MAPPING = {
     10 => 0,
     11 => 1,
-    12 => 2
+    12 => 2,
+    13 => 6,
+    :cdh4 => 0,
+    :cdh5 => 4,
+    :PROTOCOL_V1 => 0,
+    :PROTOCOL_V2 => 1,
+    :PROTOCOL_V3 => 2,
+    :PROTOCOL_V4 => 3,
+    :PROTOCOL_V5 => 4,
+    :PROTOCOL_V6 => 5,
+    :PROTOCOL_V7 => 6
   }
   
   def tcli_connect(server, port=10_000, options)

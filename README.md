@@ -73,7 +73,7 @@ Since Hiveserver has no options, connection code is very simple:
 Hiveserver2 has several options with how it is run. The connection code takes
 a hash with these possible parameters:
 * `:transport` - one of `:buffered` (BufferedTransport), `:http` (HTTPClientTransport), or `:sasl` (SaslClientTransport)
-* `:hive_version` - the number after the period in the Hive version; e.g. `10`, `11`, `12`
+* `:hive_version` - the number after the period in the Hive version; e.g. `10`, `11`, `12`, `13` or one of a set of symbols; see Hiveserver2 protocol versions below for details
 * `:timeout` - if using BufferedTransport or SaslClientTransport, this is how long the timeout on the socket will be
 * `:sasl_params` - if using SaslClientTransport, this is a hash of parameters to set up the SASL connection
 
@@ -99,6 +99,34 @@ Connecting with a specific Hive version (0.12) and using the `:http` transport:
     end 
 
 We have not tested the SASL connection, as we don't run SASL; pull requests and testing are welcomed.
+
+#### Hiveserver2 protocol versions
+
+Since the introduction of Hiveserver2 in Hive 0.10, there have been a number of revisions to the Thrift protocol it uses.
+
+The following table lists the available values you can supply to the `:hive_version` parameter when making a connection
+to Hiveserver2.
+
+| value   | Thrift protocol version | notes
+| ------- | ----------------------- | -----
+| `10`    | V1                      | First version of the Thrift protocol used only by Hive 0.10
+| `11`    | V2                      | Used by the Hive 0.11 release (*but not CDH5 which ships with Hive 0.11!*) - adds asynchronous execution
+| `12`    | V3                      | Used by the Hive 0.12 release, adds varchar type and primitive type qualifiers
+| `13`    | V7                      | Used by the Hive 0.13 release, adds features from V4, V5 and V6, plus token-based delegation connections
+| `:cdh4` | V1                      | CDH4 uses the V1 protocol as it ships with the upstream Hive 0.10
+| `:cdh5` | V5                      | CDH5 ships with upstream Hive 0.11, but adds patches to bring the Thrift protocol up to V5
+
+In addition, you can explicitly set the Thrift protocol version according to this table:
+
+| value           | Thrift protocol version | notes
+| --------------- | ----------------------- | -----
+| `:PROTOCOL_V1`  | V1                      | Used by Hive 0.10 release
+| `:PROTOCOL_V2`  | V2                      | Used by Hive 0.11 release
+| `:PROTOCOL_V3`  | V3                      | Used by Hive 0.12 release
+| `:PROTOCOL_V4`  | V4                      | Updated during Hive 0.13 development, adds decimal precision/scale, char type
+| `:PROTOCOL_V5`  | V5                      | Updated during Hive 0.13 development, adds error details when GetOperationStatus returns in error state
+| `:PROTOCOL_V6`  | V6                      | Updated during Hive 0.13 development, adds binary type for binary payload, uses columnar result set
+| `:PROTOCOL_V7`  | V7                      | Used by Hive 0.13 release, support for token-based delegation connections
 
 ## Examples
 
