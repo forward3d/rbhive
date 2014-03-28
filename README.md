@@ -73,7 +73,8 @@ Since Hiveserver has no options, connection code is very simple:
 Hiveserver2 has several options with how it is run. The connection code takes
 a hash with these possible parameters:
 * `:transport` - one of `:buffered` (BufferedTransport), `:http` (HTTPClientTransport), or `:sasl` (SaslClientTransport)
-* `:hive_version` - the number after the period in the Hive version; e.g. `10`, `11`, `12`, `13` or one of a set of symbols; see Hiveserver2 protocol versions below for details
+* `:hive_version` - the number after the period in the Hive version; e.g. `10`, `11`, `12`, `13` or one of 
+   a set of symbols; see [Hiveserver2 protocol versions](Hiveserver2-protocol-versions) below for details
 * `:timeout` - if using BufferedTransport or SaslClientTransport, this is how long the timeout on the socket will be
 * `:sasl_params` - if using SaslClientTransport, this is a hash of parameters to set up the SASL connection
 
