@@ -5,7 +5,7 @@
 #
 
 require 'thrift'
-require 't_c_l_i_service_types'
+require_relative 't_c_l_i_service_types'
 
 module Hive2
   module Thrift
