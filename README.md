@@ -246,6 +246,9 @@ on whether it works correctly.
 
 ## Contributing
 
+We welcome contributions, issues and pull requests. If there's a feature missing in RBHive that you need, or you
+think you've found a bug, please do not hesitate to create an issue.
+
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
