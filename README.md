@@ -144,6 +144,7 @@ In addition, you can explicitly set the Thrift protocol version according to thi
 In versions of Hive later than 0.12, the Thrift server supports asynchronous execution.
 
 The high-level view of using this feature is as follows:
+
 1. Submit your query using `async_execute(query)`. This function returns a hash
    with the following keys: `:guid`, `:secret`, and `:session`. You don't need to
    care about the internals of this hash - all methods that interact with an async
