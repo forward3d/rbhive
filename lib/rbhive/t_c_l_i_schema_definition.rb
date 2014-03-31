@@ -4,6 +4,8 @@ module RBHive
   class TCLISchemaDefinition
     attr_reader :schema
 
+    NAN = Float::NAN rescue 0.0/0.0
+    INFINITY = Float::INFINITY rescue 1.0/0.0
     TYPES = {
       :boolean  => :to_s,
       :string   => :to_s,
@@ -65,8 +67,8 @@ module RBHive
 
     def coerce_column(column_name, value)
       type = column_type_map[column_name]
-      return 1.0/0.0 if(type != :string && value == "Infinity")
-      return 0.0/0.0 if(type != :string && value == "NaN")
+      return INFINITY if (type != :string && value == "Infinity")
+      return NAN if (type != :string && value == "NaN")
       return coerce_complex_value(value) if type.to_s =~ /^array/
       conversion_method = TYPES[type]
       conversion_method ? value.send(conversion_method) : value
