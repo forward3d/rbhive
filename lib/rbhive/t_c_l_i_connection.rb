@@ -103,7 +103,6 @@ module RBHive
       @client = Hive2::Thrift::TCLIService::Client.new(@protocol)
       @session = nil
       @logger.info("Connecting to HiveServer2 #{server} on port #{port}")
-      @mutex = Mutex.new
     end
     
     def thrift_hive_protocol(version)
@@ -169,7 +168,11 @@ module RBHive
     end
 
     def execute(query)
-      execute_safe(query)
+      @logger.info("Executing Hive Query: #{query}")
+      req = prepare_execute_statement(query)
+      exec_result = client.ExecuteStatement(req)
+      raise_error_if_failed!(exec_result)
+      exec_result
     end
 
     def priority=(priority)
@@ -185,6 +188,118 @@ module RBHive
       self.execute("SET #{name}=#{value}")
     end
     
+    # Async execute
+    def async_execute(query)
+      @logger.info("Executing query asynchronously: #{query}")
+      op_handle = @client.ExecuteStatement(
+        Hive2::Thrift::TExecuteStatementReq.new(
+          sessionHandle: @session.sessionHandle,
+          statement: query,
+          runAsync: true
+        )
+      ).operationHandle
+      
+      # Return handles to get hold of this query / session again
+      {
+        session: @session.sessionHandle, 
+        guid: op_handle.operationId.guid, 
+        secret: op_handle.operationId.secret
+      }
+    end
+    
+    # Is the query complete?
+    def async_is_complete?(handles)
+      async_state(handles) == :finished
+    end
+    
+    # Is the query actually running?
+    def async_is_running?(handles)
+      async_state(handles) == :running
+    end
+    
+    # Has the query failed?
+    def async_is_failed?(handles)
+      async_state(handles) == :error
+    end
+    
+    def async_is_cancelled?(handles)
+      async_state(handles) == :cancelled
+    end
+    
+    def async_cancel(handles)
+      @client.CancelOperation(prepare_cancel_request(handles))
+    end
+    
+    # Map states to symbols
+    def async_state(handles)
+      response = @client.GetOperationStatus(
+        Hive2::Thrift::TGetOperationStatusReq.new(operationHandle: prepare_operation_handle(handles))
+      )
+      puts response.operationState
+      case response.operationState
+      when Hive2::Thrift::TOperationState::FINISHED_STATE
+        return :finished
+      when Hive2::Thrift::TOperationState::INITIALIZED_STATE
+        return :initialized
+      when Hive2::Thrift::TOperationState::RUNNING_STATE
+        return :running
+      when Hive2::Thrift::TOperationState::CANCELED_STATE
+        return :cancelled
+      when Hive2::Thrift::TOperationState::CLOSED_STATE
+        return :closed
+      when Hive2::Thrift::TOperationState::ERROR_STATE
+        return :error
+      when Hive2::Thrift::TOperationState::UKNOWN_STATE
+        return :unknown
+      when Hive2::Thrift::TOperationState::PENDING_STATE
+        return :pending
+      else
+        return :state_not_in_protocol
+      end
+    end
+        
+    # Async fetch results from an async execute
+    def async_fetch(handles, max_rows = 100)
+      # Can't get data from an unfinished query
+      unless async_is_complete?(handles)
+        raise "Can't perform fetch on a query in state: #{async_state(handles[:guid], handles[:secret])}"
+      end
+      
+      # Fetch and
+      fetch_rows(prepare_operation_handle(handles), :first, max_rows)
+    end
+    
+    # Performs a query on the server, fetches the results in batches of *batch_size* rows
+    # and yields the result batches to a given block as arrays of rows.
+    def async_fetch_in_batch(handles, batch_size = 1000, &block)
+      raise "No block given for the batch fetch request!" unless block_given?
+      # Can't get data from an unfinished query
+      unless async_is_complete?(handles)
+        raise "Can't perform fetch on a query in state: #{async_state(handles[:guid], handles[:secret])}"
+      end
+
+      # Now let's iterate over the results
+      loop do
+        rows = fetch_rows(prepare_operation_handle(handles), :next, batch_size)
+        break if rows.empty?
+        yield rows
+      end
+    end
+    
+    def async_close_session(handles)
+      validate_handles!(handles)
+      @client.CloseSession(Hive2::Thrift::TCloseSessionReq.new( sessionHandle: handles[:session] ))
+    end
+    
+    # Pull rows from the query result
+    def fetch_rows(op_handle, orientation = :first, max_rows = 1000)
+      fetch_req = prepare_fetch_results(op_handle, orientation, max_rows)
+      fetch_results = @client.FetchResults(fetch_req)
+      raise_error_if_failed!(fetch_results)
+      rows = fetch_results.results.rows
+      TCLIResultSet.new(rows, TCLISchemaDefinition.new(get_schema_for(op_handle), rows.first))
+    end
+        
     # Performs a explain on the supplied query on the server, returns it as a ExplainResult.
     # (Only works on 0.12 if you have this patch - https://issues.apache.org/jira/browse/HIVE-5492)
     def explain(query)
@@ -197,58 +312,37 @@ module RBHive
 
     # Performs a query on the server, fetches up to *max_rows* rows and returns them as an array.
     def fetch(query, max_rows = 100)
-      safe do
-        # Execute the query and check the result
-        exec_result = execute_unsafe(query)
-        raise_error_if_failed!(exec_result)
+      # Execute the query and check the result
+      exec_result = execute(query)
+      raise_error_if_failed!(exec_result)
 
-        # Get search operation handle to fetch the results
-        op_handle = exec_result.operationHandle
-
-        # Prepare and execute fetch results request
-        fetch_req = prepare_fetch_results(op_handle, :first, max_rows)
-        fetch_results = client.FetchResults(fetch_req)
-        raise_error_if_failed!(fetch_results)
-
-        # Get data rows and format the result
-        rows = fetch_results.results.rows
-        the_schema = TCLISchemaDefinition.new(get_schema_for( op_handle ), rows.first)
-        TCLIResultSet.new(rows, the_schema)
-      end
+      # Get search operation handle to fetch the results
+      op_handle = exec_result.operationHandle
+      
+      # Fetch the rows
+      fetch_rows(op_handle, :first, max_rows)
     end
 
     # Performs a query on the server, fetches the results in batches of *batch_size* rows
     # and yields the result batches to a given block as arrays of rows.
     def fetch_in_batch(query, batch_size = 1000, &block)
       raise "No block given for the batch fetch request!" unless block_given?
-      safe do
-        # Execute the query and check the result
-        exec_result = execute_unsafe(query)
-        raise_error_if_failed!(exec_result)
+      
+      # Execute the query and check the result
+      exec_result = execute(query)
+      raise_error_if_failed!(exec_result)
 
-        # Get search operation handle to fetch the results
-        op_handle = exec_result.operationHandle
+      # Get search operation handle to fetch the results
+      op_handle = exec_result.operationHandle
 
-        # Prepare fetch results request
-        fetch_req = prepare_fetch_results(op_handle, :next, batch_size)
+      # Prepare fetch results request
+      fetch_req = prepare_fetch_results(op_handle, :next, batch_size)
 
-        # Now let's iterate over the results
-        loop do
-          # Fetch next batch and raise an exception if it failed
-          fetch_results = client.FetchResults(fetch_req)
-          raise_error_if_failed!(fetch_results)
-
-          # Get data rows from the result
-          rows = fetch_results.results.rows
-          break if rows.empty?
-
-          # Prepare schema definition for the row
-          schema_for_req ||= get_schema_for(op_handle)
-          the_schema ||= TCLISchemaDefinition.new(schema_for_req, rows.first)
-
-          # Format the results and yield them to the given block
-          yield TCLIResultSet.new(rows, the_schema)
-        end
+      # Now let's iterate over the results
+      loop do
+        rows = fetch_rows(op_handle, :next, batch_size)
+        break if rows.empty?
+        yield rows
       end
     end
 
@@ -274,26 +368,6 @@ module RBHive
     end
 
     private
-
-    def execute_safe(query)
-      safe do
-        exec_result = execute_unsafe(query)
-        raise_error_if_failed!(exec_result)
-        exec_result
-      end
-    end
-
-    def execute_unsafe(query)
-      @logger.info("Executing Hive Query: #{query}")
-      req = prepare_execute_statement(query)
-      client.ExecuteStatement(req)
-    end
-
-    def safe
-      ret = nil
-      @mutex.synchronize { ret = yield }
-      ret
-    end
 
     def prepare_open_session(client_protocol)
       req = ::Hive2::Thrift::TOpenSessionReq.new( @options[:sasl_params].nil? ? [] : @options[:sasl_params] )
@@ -321,6 +395,27 @@ module RBHive
         orientation: orientation_const,
         maxRows: rows
       )
+    end
+
+    def prepare_operation_handle(handles)
+      validate_handles!(handles)
+      Hive2::Thrift::TOperationHandle.new(
+        operationId: Hive2::Thrift::THandleIdentifier.new(guid: handles[:guid], secret: handles[:secret]),
+        operationType: Hive2::Thrift::TOperationType::EXECUTE_STATEMENT,
+        hasResultSet: false
+      )
+    end
+    
+    def prepare_cancel_request(handles)
+      Hive2::Thrift::TCancelOperationReq.new(
+        operationHandle: prepare_operation_handle(handles)
+      )
+    end
+    
+    def validate_handles!(handles)
+      unless handles.has_key?(:guid) and handles.has_key?(:secret) and handles.has_key?(:session)
+        raise "Invalid handles hash: #{handles.inspect}"
+      end
     end
 
     def get_schema_for(handle)

@@ -1,7 +1,7 @@
-# RBHive -- Ruby thrift lib for executing Hive queries
+# RBHive - A Ruby Thrift client for Apache Hive
 
 RBHive is a simple Ruby gem to communicate with the [Apache Hive](http://hive.apache.org)
-Thrift server.
+Thrift servers.
 
 It supports:
 * Hiveserver (the original Thrift service shipped with Hive since early releases)
@@ -12,6 +12,10 @@ It is capable of using the following Thrift transports:
 * BufferedTransport (the default)
 * SaslClientTransport ([SASL-enabled](http://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer) transport)
 * HTTPClientTransport (tunnels Thrift over HTTP)
+
+As of version 1.0, it supports asynchronous execution of queries. This allows you to submit
+a query, disconnect, then reconnect later to check the status and retrieve the results.
+This frees systems of the need to keep a persistent TCP connection. 
 
 ## About Thrift services and transports
 
@@ -30,6 +34,12 @@ supported; starting with Hive 0.12, HTTPClientTransport is also supported.
 
 Each of the versions after Hive 0.10 has a slightly different Thrift interface; when
 connecting, you must specify the Hive version or you may get an exception.
+
+Hiveserver2 supports (in versions later than 0.12) asynchronous query execution. This
+works by submitting a query and retrieving a handle to the execution process; you can
+then reconnect at a later time and retrieve the results using this handle.
+Using the asynchronous methods has some caveats - please read the Asynchronous Execution
+section of the documentation thoroughly before using them.
 
 RBHive implements this client with the `RBHive::TCLIConnection` class.
 
@@ -128,6 +138,75 @@ In addition, you can explicitly set the Thrift protocol version according to thi
 | `:PROTOCOL_V5`  | V5                      | Updated during Hive 0.13 development, adds error details when GetOperationStatus returns in error state
 | `:PROTOCOL_V6`  | V6                      | Updated during Hive 0.13 development, adds binary type for binary payload, uses columnar result set
 | `:PROTOCOL_V7`  | V7                      | Used by Hive 0.13 release, support for token-based delegation connections
+
+## Asynchronous execution with Hiveserver2
+
+In versions of Hive later than 0.12, the Thrift server supports asynchronous execution.
+
+The high-level view of using this feature is as follows:
+1. Submit your query using `async_execute(query)`. This function returns a hash
+   with the following keys: `:guid`, `:secret`, and `:session`. You don't need to
+   care about the internals of this hash - all methods that interact with an async
+   query require this hash, and you can just store it and hand it to the methods.
+2. To check the state of the query, call `async_state(handles)`, where `handles`
+   is the handles hash given to you when you called `async_execute(query)`.
+3. To retrieve results, call either `async_fetch(handles)` or `async_fetch_in_batch(handles)`,
+   which work like the non async methods.
+4. When you're done with the query, call `async_close_session(handles)`.
+
+### Memory leaks
+
+When you call `async_close_session(handles)`, *all async handles created during this
+session are closed*.
+
+If you do not close the sessions you create, *you will leak memory in the Hiveserver2 process*.
+Be very careful to close your sessions!
+
+### Method documentation
+
+#### `async_execute(query)`
+
+This method submits a query for async execution. The hash you get back is used in the other
+async methods, and will look like this:
+
+    {
+      :guid => (binary string),
+      :secret => (binary string),
+      :session => (binary string)
+    }
+
+The Thrift protocol specifies the strings as "binary" - which means they have no encoding.
+Be *extremely* careful when manipulating or storing these values, as they can quite easily
+get converted to UTF-8 strings, which will make them invalid when trying to retrieve async data.
+
+#### `async_state(handles)`
+
+`handles` is the hash returned by `async_execute(query)`. The state will be a symbol with
+one of the following values and meanings:
+
+| symbol                | meaning
+| --------------------- | -------
+| :initialized          | The query is initialized in Hive and ready to run
+| :running              | The query is running (either as a MapReduce job or within process)
+| :finished             | The query is completed and results can be retrieved
+| :cancelled            | The query was cancelled by a user
+| :closed               | Unknown at present
+| :error                | The query is invalid semantically or broken in another way
+| :unknown              | The query is in an unknown state
+| :pending              | The query is ready to run but is not running
+
+There are also the utility methods `async_is_complete?(handles)`, `async_is_running?(handles)`, 
+`async_is_failed?(handles)` and `async_is_cancelled?(handles)`.
+
+#### `async_cancel(handles)`
+
+Calling this method will cancel the query in execution.
+
+#### `async_fetch(handles)`, `async_fetch_in_batch(handles)`
+
+These methods let you fetch the results of the async query, if they are complete. If you call
+these methods on an incomplete query, they will raise an exception. They work in exactly the
+same way as the normal synchronous methods.
 
 ## Examples
 
