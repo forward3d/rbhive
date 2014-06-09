@@ -262,7 +262,7 @@ module RBHive
     def async_fetch(handles, max_rows = 100)
       # Can't get data from an unfinished query
       unless async_is_complete?(handles)
-        raise "Can't perform fetch on a query in state: #{async_state(handles[:guid], handles[:secret])}"
+        raise "Can't perform fetch on a query in state: #{async_state(handles)}"
       end
       
       # Fetch and
@@ -275,7 +275,7 @@ module RBHive
       raise "No block given for the batch fetch request!" unless block_given?
       # Can't get data from an unfinished query
       unless async_is_complete?(handles)
-        raise "Can't perform fetch on a query in state: #{async_state(handles[:guid], handles[:secret])}"
+        raise "Can't perform fetch on a query in state: #{async_state(handles)}"
       end
 
       # Now let's iterate over the results
