@@ -1,4 +1,5 @@
 require 'json'
+require File.join(File.dirname(__FILE__), *%w[.. thrift t_c_l_i_service_constants])
 
 module RBHive
   class TCLISchemaDefinition
@@ -52,7 +53,7 @@ module RBHive
       @column_type_map ||= column_names.inject({}) do |hsh, c| 
         definition = @schema.columns.find {|s| s.columnName.to_sym == c }
         # If the column isn't in the schema (eg partitions in SELECT * queries) assume they are strings
-        type = TYPE_NAMES[definition.typeDesc.types.first.primitiveEntry.type].downcase rescue nil
+        type = Hive2::Thrift::TYPE_NAMES[definition.typeDesc.types.first.primitiveEntry.type].downcase rescue nil
         hsh[c] = definition && type ? type.to_sym : :string
         hsh
       end
