@@ -30,7 +30,7 @@ module Thrift
 end
 
 module RBHive
-  
+
   HIVE_THRIFT_MAPPING = {
     10 => 0,
     11 => 1,
@@ -46,7 +46,7 @@ module RBHive
     :PROTOCOL_V6 => 5,
     :PROTOCOL_V7 => 6
   }
-  
+
   def tcli_connect(server, port=10_000, options)
     connection = RBHive::TCLIConnection.new(server, port, options)
     ret = nil
@@ -83,20 +83,20 @@ module RBHive
     def initialize(server, port=10_000, options={}, logger=StdOutLogger.new)
       options ||= {} # backwards compatibility
       raise "'options' parameter must be a hash" unless options.is_a?(Hash)
-      
+
       if options[:transport] == :sasl and options[:sasl_params].nil?
         raise ":transport is set to :sasl, but no :sasl_params option was supplied"
       end
-      
+
       # Defaults to buffered transport, Hive 0.10, 1800 second timeout
       options[:transport]     ||= :buffered
       options[:hive_version]  ||= 10
       options[:timeout]       ||= 1800
       @options = options
-      
+
       # Look up the appropriate Thrift protocol version for the supplied Hive version
       @thrift_protocol_version = thrift_hive_protocol(options[:hive_version])
-      
+
       @logger = logger
       @transport = thrift_transport(server, port)
       @protocol = Thrift::BinaryProtocol.new(@transport)
@@ -104,11 +104,11 @@ module RBHive
       @session = nil
       @logger.info("Connecting to HiveServer2 #{server} on port #{port}")
     end
-    
+
     def thrift_hive_protocol(version)
       HIVE_THRIFT_MAPPING[version] || raise("Invalid Hive version")
     end
-    
+
     def thrift_transport(server, port)
       @logger.info("Initializing transport #{@options[:transport]}")
       case @options[:transport]
@@ -187,7 +187,7 @@ module RBHive
       @logger.info("Setting #{name}=#{value}")
       self.execute("SET #{name}=#{value}")
     end
-    
+
     # Async execute
     def async_execute(query)
       @logger.info("Executing query asynchronously: #{query}")
@@ -198,38 +198,38 @@ module RBHive
           runAsync: true
         )
       ).operationHandle
-      
+
       # Return handles to get hold of this query / session again
       {
-        session: @session.sessionHandle, 
-        guid: op_handle.operationId.guid, 
+        session: @session.sessionHandle,
+        guid: op_handle.operationId.guid,
         secret: op_handle.operationId.secret
       }
     end
-    
+
     # Is the query complete?
     def async_is_complete?(handles)
       async_state(handles) == :finished
     end
-    
+
     # Is the query actually running?
     def async_is_running?(handles)
       async_state(handles) == :running
     end
-    
+
     # Has the query failed?
     def async_is_failed?(handles)
       async_state(handles) == :error
     end
-    
+
     def async_is_cancelled?(handles)
       async_state(handles) == :cancelled
     end
-    
+
     def async_cancel(handles)
       @client.CancelOperation(prepare_cancel_request(handles))
     end
-    
+
     # Map states to symbols
     def async_state(handles)
       response = @client.GetOperationStatus(
@@ -257,18 +257,18 @@ module RBHive
         return :state_not_in_protocol
       end
     end
-        
+
     # Async fetch results from an async execute
     def async_fetch(handles, max_rows = 100)
       # Can't get data from an unfinished query
       unless async_is_complete?(handles)
         raise "Can't perform fetch on a query in state: #{async_state(handles)}"
       end
-      
+
       # Fetch and
       fetch_rows(prepare_operation_handle(handles), :first, max_rows)
     end
-    
+
     # Performs a query on the server, fetches the results in batches of *batch_size* rows
     # and yields the result batches to a given block as arrays of rows.
     def async_fetch_in_batch(handles, batch_size = 1000, &block)
@@ -285,12 +285,12 @@ module RBHive
         yield rows
       end
     end
-    
+
     def async_close_session(handles)
       validate_handles!(handles)
       @client.CloseSession(Hive2::Thrift::TCloseSessionReq.new( sessionHandle: handles[:session] ))
     end
-    
+
     # Pull rows from the query result
     def fetch_rows(op_handle, orientation = :first, max_rows = 1000)
       fetch_req = prepare_fetch_results(op_handle, orientation, max_rows)
@@ -299,7 +299,7 @@ module RBHive
       rows = fetch_results.results.rows
       TCLIResultSet.new(rows, TCLISchemaDefinition.new(get_schema_for(op_handle), rows.first))
     end
-        
+
     # Performs a explain on the supplied query on the server, returns it as a ExplainResult.
     # (Only works on 0.12 if you have this patch - https://issues.apache.org/jira/browse/HIVE-5492)
     def explain(query)
@@ -318,7 +318,7 @@ module RBHive
 
       # Get search operation handle to fetch the results
       op_handle = exec_result.operationHandle
-      
+
       # Fetch the rows
       fetch_rows(op_handle, :first, max_rows)
     end
@@ -327,7 +327,7 @@ module RBHive
     # and yields the result batches to a given block as arrays of rows.
     def fetch_in_batch(query, batch_size = 1000, &block)
       raise "No block given for the batch fetch request!" unless block_given?
-      
+
       # Execute the query and check the result
       exec_result = execute(query)
       raise_error_if_failed!(exec_result)
@@ -370,7 +370,9 @@ module RBHive
     private
 
     def prepare_open_session(client_protocol)
-      req = ::Hive2::Thrift::TOpenSessionReq.new( @options[:sasl_params].nil? ? [] : @options[:sasl_params] )
+      req = ::Hive2::Thrift::TOpenSessionReq.new( @options[:sasl_params].nil? ? [] : {
+                                                    :username => @options[:sasl_params][:username],
+                                                    :password => @options[:sasl_params][:password]})
       req.client_protocol = client_protocol
       req
     end
@@ -405,13 +407,13 @@ module RBHive
         hasResultSet: false
       )
     end
-    
+
     def prepare_cancel_request(handles)
       Hive2::Thrift::TCancelOperationReq.new(
         operationHandle: prepare_operation_handle(handles)
       )
     end
-    
+
     def validate_handles!(handles)
       unless handles.has_key?(:guid) and handles.has_key?(:secret) and handles.has_key?(:session)
         raise "Invalid handles hash: #{handles.inspect}"

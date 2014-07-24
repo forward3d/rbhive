@@ -15,7 +15,7 @@ It is capable of using the following Thrift transports:
 
 As of version 1.0, it supports asynchronous execution of queries. This allows you to submit
 a query, disconnect, then reconnect later to check the status and retrieve the results.
-This frees systems of the need to keep a persistent TCP connection. 
+This frees systems of the need to keep a persistent TCP connection.
 
 ## About Thrift services and transports
 
@@ -27,7 +27,7 @@ BufferedTransport.
 
 ### Hiveserver2
 
-[Hiveserver2](https://cwiki.apache.org/confluence/display/Hive/Setting+up+HiveServer2) 
+[Hiveserver2](https://cwiki.apache.org/confluence/display/Hive/Setting+up+HiveServer2)
 (the new Thrift interface) can support many concurrent client connections. It is shipped
 with Hive 0.10 and later. In Hive 0.10, only BufferedTranport and SaslClientTransport are
 supported; starting with Hive 0.12, HTTPClientTransport is also supported.
@@ -61,7 +61,7 @@ Otherwise you'll get this nasty-looking exception in the logs:
       at org.apache.thrift.server.TThreadPoolServer$WorkerProcess.run(TThreadPoolServer.java:206)
       at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
-      at java.lang.Thread.run(Thread.java:662) 
+      at java.lang.Thread.run(Thread.java:662)
 
 ### Other Hive-compatible services
 
@@ -75,7 +75,7 @@ Since Hiveserver has no options, connection code is very simple:
 
     RBHive.connect('hive.server.address', 10_000) do |connection|
       connection.fetch 'SELECT city, country FROM cities'
-    end 
+    end
     ➔ [{:city => "London", :country => "UK"}, {:city => "Mumbai", :country => "India"}, {:city => "New York", :country => "USA"}]
 
 ### Hiveserver2
@@ -83,12 +83,12 @@ Since Hiveserver has no options, connection code is very simple:
 Hiveserver2 has several options with how it is run. The connection code takes
 a hash with these possible parameters:
 * `:transport` - one of `:buffered` (BufferedTransport), `:http` (HTTPClientTransport), or `:sasl` (SaslClientTransport)
-* `:hive_version` - the number after the period in the Hive version; e.g. `10`, `11`, `12`, `13` or one of 
+* `:hive_version` - the number after the period in the Hive version; e.g. `10`, `11`, `12`, `13` or one of
    a set of symbols; see [Hiveserver2 protocol versions](#hiveserver2-protocol-versions) below for details
 * `:timeout` - if using BufferedTransport or SaslClientTransport, this is how long the timeout on the socket will be
 * `:sasl_params` - if using SaslClientTransport, this is a hash of parameters to set up the SASL connection
 
-If you pass either an empty hash or nil in place of the options (or do not supply them), the connection 
+If you pass either an empty hash or nil in place of the options (or do not supply them), the connection
 is attempted with the Hive version set to 0.10, using `:buffered` as the transport, and a timeout of 1800 seconds.
 
 Connecting with the defaults:
@@ -107,7 +107,7 @@ Connecting with a specific Hive version (0.12) and using the `:http` transport:
 
     RBHive.tcli_connect('hive.server.address', 10_000, {:hive_version => 12, :transport => :http}) do |connection|
       connection.fetch('SHOW TABLES')
-    end 
+    end
 
 We have not tested the SASL connection, as we don't run SASL; pull requests and testing are welcomed.
 
@@ -196,7 +196,7 @@ one of the following values and meanings:
 | :unknown              | The query is in an unknown state
 | :pending              | The query is ready to run but is not running
 
-There are also the utility methods `async_is_complete?(handles)`, `async_is_running?(handles)`, 
+There are also the utility methods `async_is_complete?(handles)`, `async_is_running?(handles)`,
 `async_is_failed?(handles)` and `async_is_cancelled?(handles)`.
 
 #### `async_cancel(handles)`
@@ -217,14 +217,14 @@ same way as the normal synchronous methods.
 
     RBHive.connect('hive.server.address', 10_000) do |connection|
       connection.fetch 'SELECT city, country FROM cities'
-    end 
+    end
     ➔ [{:city => "London", :country => "UK"}, {:city => "Mumbai", :country => "India"}, {:city => "New York", :country => "USA"}]
 
 #### Hiveserver2
 
     RBHive.tcli_connect('hive.server.address', 10_000) do |connection|
       connection.fetch 'SELECT city, country FROM cities'
-    end 
+    end
     ➔ [{:city => "London", :country => "UK"}, {:city => "Mumbai", :country => "India"}, {:city => "New York", :country => "USA"}]
 
 ### Executing a query
@@ -258,13 +258,13 @@ Then for Hiveserver:
 
     RBHive.connect('hive.server.address', 10_000) do |connection|
       connection.create_table(table)
-    end  
+    end
 
 Or Hiveserver2:
 
     RBHive.tcli_connect('hive.server.address', 10_000) do |connection|
       connection.create_table(table)
-    end  
+    end
 
 ### Modifying table schema
 
@@ -282,18 +282,18 @@ Then for Hiveserver:
 
     RBHive.connect('hive.server.address') do |connection|
       connection.replace_columns(table)
-    end  
+    end
 
 Or Hiveserver2:
 
     RBHive.tcli_connect('hive.server.address') do |connection|
       connection.replace_columns(table)
-    end  
+    end
 
 ### Setting properties
 
 You can set various properties for Hive tasks, some of which change how they run. Consult the Apache
-Hive documentation and Hadoop's documentation for the various properties that can be set. 
+Hive documentation and Hadoop's documentation for the various properties that can be set.
 For example, you can set the map-reduce job's priority with the following:
 
     connection.set("mapred.job.priority", "VERY_HIGH")
@@ -302,7 +302,7 @@ For example, you can set the map-reduce job's priority with the following:
 
 #### Hiveserver
 
-    RBHive.connect('hive.hadoop.forward.co.uk', 10_000) {|connection| 
+    RBHive.connect('hive.hadoop.forward.co.uk', 10_000) {|connection|
       result = connection.fetch("describe some_table")
       puts result.column_names.inspect
       puts result.first.inspect
@@ -310,11 +310,26 @@ For example, you can set the map-reduce job's priority with the following:
 
 #### Hiveserver2
 
-    RBHive.tcli_connect('hive.hadoop.forward.co.uk', 10_000) {|connection| 
+    RBHive.tcli_connect('hive.hadoop.forward.co.uk', 10_000) {|connection|
       result = connection.fetch("describe some_table")
       puts result.column_names.inspect
       puts result.first.inspect
     }
+
+#### SASL/GSSAPI (Kerberos)
+
+    # assuming you're kinited
+    RBHive.tcli_connect('hive.hadoop.forward.co.uk', 10_000,
+                    {:hive_version => :cdh5,
+                      :transport => :sasl,
+                      :sasl_params => {
+                        :mechanism => 'GSSAPI',
+                        :remote_host => 'hive.hadoop.forward.co.uk',
+                        :remote_principal => 'hive/hive.hadoop.forward.co.uk@FORWARD.CO.UK'
+                      }}) {|connection|
+      puts connection.fetch("show tables").inspect
+    }
+
 
 ## Testing
 
