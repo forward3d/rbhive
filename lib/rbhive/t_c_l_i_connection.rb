@@ -47,7 +47,7 @@ module RBHive
     :PROTOCOL_V7 => 6
   }
 
-  def tcli_connect(server, port=10_000, options)
+  def tcli_connect(server, port=10_000, options={})
     connection = RBHive::TCLIConnection.new(server, port, options)
     ret = nil
     begin
