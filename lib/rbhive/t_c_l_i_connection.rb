@@ -66,7 +66,7 @@ module RBHive
       end
     end
 
-    return ret
+    ret
   end
   module_function :tcli_connect
 
