@@ -97,17 +97,23 @@ Connecting with the defaults:
       connection.fetch('SHOW TABLES')
     end
 
+Connecting with a Logger:
+
+    RBHive.tcli_connect('hive.server.address', 10_000, { logger: Logger.new(STDOUT) }) do |connection|
+      connection.fetch('SHOW TABLES')
+    end
+
 Connecting with a specific Hive version (0.12 in this case):
 
-    RBHive.tcli_connect('hive.server.address', 10_000, {:hive_version => 12}) do |connection|
+    RBHive.tcli_connect('hive.server.address', 10_000, { hive_version: 12 }) do |connection|
       connection.fetch('SHOW TABLES')
     end
 
 Connecting with a specific Hive version (0.12) and using the `:http` transport:
 
-    RBHive.tcli_connect('hive.server.address', 10_000, {:hive_version => 12, :transport => :http}) do |connection|
+    RBHive.tcli_connect('hive.server.address', 10_000, { hive_version: 12, transport: :http }) do |connection|
       connection.fetch('SHOW TABLES')
-    end 
+    end
 
 We have not tested the SASL connection, as we don't run SASL; pull requests and testing are welcomed.
 

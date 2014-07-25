@@ -46,9 +46,10 @@ module RBHive
     :PROTOCOL_V6 => 5,
     :PROTOCOL_V7 => 6
   }
-  
-  def tcli_connect(server, port=10_000, options)
-    connection = RBHive::TCLIConnection.new(server, port, options)
+
+  def tcli_connect(server, port = 10_000, options)
+    logger = options.key?(:logger) ? options.delete(:logger) : StdOutLogger.new
+    connection = RBHive::TCLIConnection.new(server, port, options, logger)
     ret = nil
     begin
       connection.open
@@ -80,7 +81,7 @@ module RBHive
   class TCLIConnection
     attr_reader :client
 
-    def initialize(server, port=10_000, options={}, logger=StdOutLogger.new)
+    def initialize(server, port = 10_000, options = {}, logger = StdOutLogger.new)
       options ||= {} # backwards compatibility
       raise "'options' parameter must be a hash" unless options.is_a?(Hash)
       
