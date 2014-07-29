@@ -254,6 +254,8 @@ module RBHive
         return :unknown
       when Hive2::Thrift::TOperationState::PENDING_STATE
         return :pending
+      when nil
+        raise "No operation state found for handles - has the session been closed?"
       else
         return :state_not_in_protocol
       end
