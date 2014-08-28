@@ -431,7 +431,9 @@ module RBHive
     def raise_error_if_failed!(result)
       return if result.status.statusCode == 0
       error_message = result.status.errorMessage || 'Execution failed!'
-      raise error_message
+      raise RBHive::TCLIConnectionError.new(error_message)
     end
   end
+
+  class TCLIConnectionError < StandardError; end
 end
