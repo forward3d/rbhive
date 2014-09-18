@@ -1,5 +1,7 @@
 # RBHive - A Ruby Thrift client for Apache Hive
 
+[![Code Climate](https://codeclimate.com/github/forward3d/rbhive/badges/gpa.svg)](https://codeclimate.com/github/forward3d/rbhive)
+
 RBHive is a simple Ruby gem to communicate with the [Apache Hive](http://hive.apache.org)
 Thrift servers.
 
