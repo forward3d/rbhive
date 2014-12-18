@@ -70,7 +70,7 @@ module Thrift
       when NEGOTIATION_STATUS[:BAD], NEGOTIATION_STATUS[:ERROR]
         raise @transport.to_io.read(len)
       when NEGOTIATION_STATUS[:COMPLETE]
-        @challenge = @transport.to_io.read len
+        @challenge = ""
       when NEGOTIATION_STATUS[:OK]
         raise "Failed to complete challenge exchange: only NONE supported currently"
       end
