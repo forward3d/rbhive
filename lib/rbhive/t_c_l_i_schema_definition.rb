@@ -9,7 +9,6 @@ module RBHive
     TYPES = {
       :boolean  => :to_s,
       :string   => :to_s,
-      :bigint   => :to_i,
       :float    => :to_f,
       :double   => :to_f,
       :int      => :to_i,
