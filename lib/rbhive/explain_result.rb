@@ -4,7 +4,7 @@ class ExplainResult
   end
   
   def ast
-    by_section[:abstract_syntax_tree].first
+    by_section[:abstract_syntax_tree]
   end
   
   def stage_count
@@ -32,13 +32,18 @@ class ExplainResult
   def by_section
     current_section = nil
     @rows.inject({}) do |sections, row|
-      if row.match(/^[A-Z]/)
+      if row.match(/^[A-Z]/) && row.match(/^[^TOK]/) #TOK_QUERY doesn't have indent
         current_section = row.chomp(':').downcase.gsub(' ', '_').to_sym
         sections[current_section] = []
       elsif row.length == 0
         next sections
       else
-        sections[current_section] << row.strip
+        #Indents is needed for AST, leave other sections to avoid breaking
+        if current_section == :abstract_syntax_tree
+           sections[current_section] << row unless row.blank?
+        else
+           sections[current_section] << row.strip unless row.blank?
+        end
       end
       sections
     end
