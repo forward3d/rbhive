@@ -4,7 +4,7 @@ class ExplainResult
   end
   
   def ast
-    by_section[:abstract_syntax_tree]
+    by_section[:abstract_syntax_tree].join("\n")
   end
   
   def stage_count
