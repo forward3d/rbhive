@@ -391,7 +391,7 @@ module Hive
         EX = 1
 
         FIELDS = {
-          SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => ::Schema},
+          SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => ::Hive::Thrift::HiveMetastoreTypes::Schema},
           EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => ::Hive::Thrift::HiveServerException}
         }
 
@@ -424,7 +424,7 @@ module Hive
         EX = 1
 
         FIELDS = {
-          SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => ::Schema},
+          SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => ::Hive::Thrift::HiveMetastoreTypes::Schema},
           EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => ::Hive::Thrift::HiveServerException}
         }
 
