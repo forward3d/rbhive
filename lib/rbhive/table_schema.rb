@@ -8,6 +8,7 @@ module RBHive
       @field_sep = options[:field_sep] || "\t"
       @line_sep = options[:line_sep] || "\n"
       @collection_sep = options[:collection_sep] || "|"
+      @stored_as = options[:stored_as] || :textfile
       @columns = []
       @partitions = []
       @serde_name = nil
@@ -31,8 +32,12 @@ module RBHive
     def create_table_statement()
       %[CREATE #{external}TABLE #{table_statement}
   ROW FORMAT #{row_format_statement}
-  STORED AS TEXTFILE
+  STORED AS #{stored_as}
   #{location}]
+    end
+
+    def stored_as
+      @stored_as.to_s.upcase
     end
 
     def row_format_statement
