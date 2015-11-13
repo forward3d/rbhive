@@ -54,6 +54,8 @@ module RBHive
     begin
       connection.open
       connection.open_session
+      options[:database] ||= 'default'
+      connection.execute("USE #{options[:database]}")
       ret = yield(connection)
 
     ensure
