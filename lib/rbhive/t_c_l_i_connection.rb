@@ -192,14 +192,16 @@ module RBHive
     # Async execute
     def async_execute(query)
       @logger.info("Executing query asynchronously: #{query}")
-      op_handle = @client.ExecuteStatement(
+      exec_result = @client.ExecuteStatement(
         Hive2::Thrift::TExecuteStatementReq.new(
           sessionHandle: @session.sessionHandle,
           statement: query,
           runAsync: true
         )
-      ).operationHandle
-      
+      )
+      raise_error_if_failed!(exec_result)
+      op_handle = exec_result.operationHandle
+
       # Return handles to get hold of this query / session again
       {
         session: @session.sessionHandle, 
