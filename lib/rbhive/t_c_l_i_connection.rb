@@ -238,7 +238,7 @@ module RBHive
       response = @client.GetOperationStatus(
         Hive2::Thrift::TGetOperationStatusReq.new(operationHandle: prepare_operation_handle(handles))
       )
-      puts response.operationState
+
       case response.operationState
       when Hive2::Thrift::TOperationState::FINISHED_STATE
         return :finished
