@@ -260,7 +260,14 @@ module RBHive
         return :state_not_in_protocol
       end
     end
-        
+
+    def async_error_message(handles)
+      response = @client.GetOperationStatus(
+        Hive2::Thrift::TGetOperationStatusReq.new(operationHandle: prepare_operation_handle(handles))
+      )
+      response.errorMessage
+    end
+ 
     # Async fetch results from an async execute
     def async_fetch(handles, max_rows = 100)
       # Can't get data from an unfinished query
