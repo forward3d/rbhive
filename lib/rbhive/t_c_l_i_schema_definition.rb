@@ -66,6 +66,7 @@ module RBHive
 
     def coerce_column(column_name, value)
       type = column_type_map[column_name]
+      return nil if value.nil?
       return INFINITY if (type != :string && value == "Infinity")
       return NAN if (type != :string && value == "NaN")
       return coerce_complex_value(value) if type.to_s =~ /^array/
