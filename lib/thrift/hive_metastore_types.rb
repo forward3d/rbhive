@@ -201,7 +201,7 @@ class PrincipalPrivilegeSet
   ::Thrift::Struct.generate_accessors self
 end
 
-class Role
+class HiveRole
   include ::Thrift::Struct, ::Thrift::Struct_Union
   ROLENAME = 1
   CREATETIME = 2
@@ -317,7 +317,7 @@ class StorageDescriptor
   ::Thrift::Struct.generate_accessors self
 end
 
-class Table
+class HiveTable
   include ::Thrift::Struct, ::Thrift::Struct_Union
   TABLENAME = 1
   DBNAME = 2

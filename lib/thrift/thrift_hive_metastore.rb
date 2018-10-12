@@ -2119,7 +2119,7 @@ module ThriftHiveMetastore
     TBL = 1
 
     FIELDS = {
-      TBL => {:type => ::Thrift::Types::STRUCT, :name => 'tbl', :class => ::Table}
+      TBL => {:type => ::Thrift::Types::STRUCT, :name => 'tbl', :class => ::HiveTable}
     }
 
     def struct_fields; FIELDS; end
@@ -2285,7 +2285,7 @@ module ThriftHiveMetastore
     O2 = 2
 
     FIELDS = {
-      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => ::Table},
+      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => ::HiveTable},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => ::MetaException},
       O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => ::NoSuchObjectException}
     }
@@ -2307,7 +2307,7 @@ module ThriftHiveMetastore
     FIELDS = {
       DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbname'},
       TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
-      NEW_TBL => {:type => ::Thrift::Types::STRUCT, :name => 'new_tbl', :class => ::Table}
+      NEW_TBL => {:type => ::Thrift::Types::STRUCT, :name => 'new_tbl', :class => ::HiveTable}
     }
 
     def struct_fields; FIELDS; end
@@ -3105,7 +3105,7 @@ module ThriftHiveMetastore
 
     FIELDS = {
       NEW_INDEX => {:type => ::Thrift::Types::STRUCT, :name => 'new_index', :class => ::Index},
-      INDEX_TABLE => {:type => ::Thrift::Types::STRUCT, :name => 'index_table', :class => ::Table}
+      INDEX_TABLE => {:type => ::Thrift::Types::STRUCT, :name => 'index_table', :class => ::HiveTable}
     }
 
     def struct_fields; FIELDS; end
@@ -3343,7 +3343,7 @@ module ThriftHiveMetastore
     ROLE = 1
 
     FIELDS = {
-      ROLE => {:type => ::Thrift::Types::STRUCT, :name => 'role', :class => ::Role}
+      ROLE => {:type => ::Thrift::Types::STRUCT, :name => 'role', :class => ::HiveRole}
     }
 
     def struct_fields; FIELDS; end
@@ -3557,7 +3557,7 @@ module ThriftHiveMetastore
     O1 = 1
 
     FIELDS = {
-      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => ::Role}},
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => ::HiveRole}},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => ::MetaException}
     }
 
