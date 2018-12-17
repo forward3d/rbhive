@@ -2,6 +2,12 @@
 
 Versioning prior to 0.5.3 was not tracked, so this changelog only lists changes introduced after 0.5.3.
 
+## 1.0.0
+
+* Asynchronous execution with Hiveserver2
+* Misc bugfixes
+
+
 ## 0.6.0
 
 0.6.0 introduces one backwards-incompatible change:
