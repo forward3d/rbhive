@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors = %w(Forward3D KolobocK)
   spec.description = 'Simple gem for executing Hive queries and collecting the results'
   spec.summary = 'Simple gem for executing Hive queries'
-  spec.email = ['andy@forward.co.uk', 'kolobock@gmail.com', 'developers@forward3d.com']
+  spec.email = ['developers@forward3d.com', 'kolobock@gmail.com']
   spec.homepage = 'http://github.com/forward3d/rbhive'
   spec.license = 'MIT'
 
