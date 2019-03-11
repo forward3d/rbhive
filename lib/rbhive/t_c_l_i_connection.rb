@@ -375,7 +375,9 @@ module RBHive
     private
 
     def prepare_open_session(client_protocol)
-      req = ::Hive2::Thrift::TOpenSessionReq.new( @options[:sasl_params].nil? ? [] : @options[:sasl_params] )
+      req = ::Hive2::Thrift::TOpenSessionReq.new( @options[:sasl_params].nil? ? [] : {
+                                                    :username => @options[:sasl_params][:username],
+                                                    :password => @options[:sasl_params][:password]})
       req.client_protocol = client_protocol
       req
     end

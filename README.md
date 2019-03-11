@@ -117,7 +117,17 @@ Connecting with a specific Hive version (0.12) and using the `:http` transport:
       connection.fetch('SHOW TABLES')
     end
 
-We have not tested the SASL connection, as we don't run SASL; pull requests and testing are welcomed.
+Connecting with SASL and Kerberos v5:
+
+    RBHive.tcli_connect('hive.hadoop.forward.co.uk', 10_000, {
+      :transport => :sasl,
+      :sasl_params => {
+        :mechanism => 'GSSAPI',
+        :remote_host => 'example.com',
+        :remote_principal => 'hive/example.com@EXAMPLE.COM'
+    ) do |connection|
+      connection.fetch("show tables")
+    end
 
 #### Hiveserver2 protocol versions
 

@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency('thrift', '~> 0.9')
+  spec.add_dependency('gssapi', '~> 1.2')
   spec.add_dependency('json')
 
   spec.add_development_dependency 'rake'
