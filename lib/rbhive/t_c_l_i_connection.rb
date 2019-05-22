@@ -394,7 +394,7 @@ module RBHive
       unless valid_orientations.include?(orientation_value)
         raise ArgumentError, "Invalid orientation: #{orientation.inspect}"
       end
-      orientation_const = eval("::Hive2::Thrift::TFetchOrientation::#{orientation_value}")
+      orientation_const = ::Hive2::Thrift::TFetchOrientation.const_get(orientation_value)
       ::Hive2::Thrift::TFetchResultsReq.new(
         operationHandle: handle,
         orientation: orientation_const,
