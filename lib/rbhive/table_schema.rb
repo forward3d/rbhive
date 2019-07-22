@@ -40,7 +40,7 @@ module RBHive
       if @stored_as.is_a? String
         @stored_as.to_s.upcase
       else
-        "INPUTFORMAT #{@stored_as[:inputformat]} OUTPUTFORMAT #{@stored_as[:outputformat]}"
+        "INPUTFORMAT '#{@stored_as[:inputformat]}' OUTPUTFORMAT '#{@stored_as[:outputformat]}'"
       end
     end
 
