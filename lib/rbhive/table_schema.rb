@@ -37,7 +37,11 @@ module RBHive
     end
 
     def stored_as
-      @stored_as.to_s.upcase
+      if @stored_as.is_a? String
+        @stored_as.to_s.upcase
+      else
+        "INPUTFORMAT #{@stored_as[:inputformat]} OUTPUTFORMAT #{@stored_as[:outputformat]}"
+      end
     end
 
     def row_format_statement
